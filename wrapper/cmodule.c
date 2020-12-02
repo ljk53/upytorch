@@ -4,8 +4,25 @@
 #include "upt_torch_functions.h"
 
 extern mp_obj_module_t module;
-extern mp_obj_type_t UTHPVariableClass;
+
 extern void UPTVariable_initModule();
+extern mp_obj_t UPTVariable_dealloc(mp_obj_t self_);
+extern void UPTVariable_print(const mp_print_t* print, mp_obj_t self_, mp_print_kind_t kind);
+
+MP_DEFINE_CONST_FUN_OBJ_1(UPTVariable_dealloc_obj, UPTVariable_dealloc);
+
+STATIC mp_rom_map_elem_t variable_locals_table[] = {
+  { MP_ROM_QSTR(MP_QSTR___del__), MP_ROM_PTR(&UPTVariable_dealloc_obj) },
+};
+MP_DEFINE_CONST_DICT(variable_locals, variable_locals_table);
+
+// THPVariableClass
+mp_obj_type_t UTHPVariableClass = {
+  .base = { &mp_type_type },
+  .name = MP_QSTR_Tensor,
+  .print = UPTVariable_print,
+  .locals_dict = (mp_obj_dict_t*)&variable_locals,
+};
 
 STATIC mp_obj_t init_module() {
   UPTVariable_initModule();

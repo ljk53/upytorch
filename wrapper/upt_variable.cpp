@@ -12,7 +12,7 @@ using namespace torch::autograd;
 extern "C" {
 
 // THPVariableClass
-mp_obj_type_t UTHPVariableClass;
+extern mp_obj_type_t UTHPVariableClass;
 
 }  // extern "C"
 
@@ -53,6 +53,8 @@ int UPTVariable_clear(UPTVariable* self) {
   return 0;
 }
 
+extern "C" {
+
 // THPVariable_dealloc
 mp_obj_t UPTVariable_dealloc(mp_obj_t self_) {
   auto self = (UPTVariable*) MP_OBJ_TO_PTR(self_);
@@ -62,15 +64,12 @@ mp_obj_t UPTVariable_dealloc(mp_obj_t self_) {
   // Py_TYPE(self)->tp_free((PyObject*)self);
   return mp_const_none;
 }
-mp_obj_fun_builtin_fixed_t UPTVariable_dealloc_obj;
 
-static void print(const mp_print_t* print, mp_obj_t self_, mp_print_kind_t kind) {
+void UPTVariable_print(const mp_print_t* print, mp_obj_t self_, mp_print_kind_t kind) {
   std::ostringstream out;
   out << UPTVariable_Unpack(self_);
   mp_printf(print, out.str().c_str());
 }
-
-extern "C" {
 
 // THPVariable_initModule
 void UPTVariable_initModule() {
@@ -78,19 +77,7 @@ void UPTVariable_initModule() {
   // The torch.Tensor class is manually written python class at pytorch/torch/tensor.py.
   // The THPVariableClass is initialized in THPAutograd_initExtension @ pytorch/torch/csrc/autograd/init.cpp
   // Here we directly initialize the UTHPVariableClass.
-  UTHPVariableClass.base.type = &mp_type_type;
-  UTHPVariableClass.name = qstr_from_str("Tensor");
-  UTHPVariableClass.print = print;
-
-  UTHPVariableClass.locals_dict = (mp_obj_dict_t*) mp_obj_new_dict(0);
-  auto locals = UTHPVariableClass.locals_dict;
-  mp_obj_dict_store(
-    MP_OBJ_FROM_PTR(locals),
-    MP_OBJ_NEW_QSTR(qstr_from_str("__del__")),
-    MP_OBJ_FROM_PTR(&UPTVariable_dealloc_obj));
-
-  UPTVariable_dealloc_obj.base.type = &mp_type_fun_builtin_1;
-  UPTVariable_dealloc_obj.fun._1 = &UPTVariable_dealloc;
+  // Nothing to do here - Everything can be statically initialized?
 }
 
 }  // extern "C"
