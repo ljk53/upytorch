@@ -5,6 +5,7 @@ CXX11_ABI ?= 1
 
 UPY_DIR ?= $(CURDIR)/micropython
 UPY_PORT_DIR ?= $(UPY_DIR)/ports/unix
+VARIANT ?= standard
 
 BUILD_ROOT ?= $(CURDIR)/build
 LIBTORCH_DIR = $(BUILD_ROOT)/$(LIBTORCH)/libtorch
@@ -23,7 +24,7 @@ CPPFLAGS = \
 	-I $(UPY_DIR)/py \
 	-I $(UPY_PORT_DIR) \
 	-I $(UPY_PORT_DIR)/build \
-	-I $(UPY_PORT_DIR)/variants/standard \
+	-I $(UPY_PORT_DIR)/variants/$(VARIANT) \
 	-I $(LIBTORCH_DIR)/include \
 	-I $(LIBTORCH_DIR)/include/torch/csrc/api/include
 
