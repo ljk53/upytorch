@@ -9,18 +9,11 @@ using namespace at;
 using namespace torch;
 using namespace torch::autograd;
 
-extern "C" {
-
-// THPVariableClass
-extern mp_obj_type_t UTHPVariableClass;
-
-}  // extern "C"
-
 // THPVariable_NewWithVar
 mp_obj_t UPTVariable_NewWithVar(Variable var) {
   auto obj = m_new_obj_with_finaliser(UPTVariable);
   auto v = static_cast<UPTVariable*>(obj);
-  v->base.type = &UTHPVariableClass;
+  v->base.type = &UPTVariableClass;
   new (&v->cdata) Variable(std::move(var));
   // HACK: reuse the TensorImpl field for CPython object.
   torch::autograd::impl::set_pyobj(v->cdata, (PyObject*) obj);
@@ -76,7 +69,7 @@ void UPTVariable_initModule() {
   // In PyTorch the native functions are bound to torch._C._TensorBase.
   // The torch.Tensor class is manually written python class at pytorch/torch/tensor.py.
   // The THPVariableClass is initialized in THPAutograd_initExtension @ pytorch/torch/csrc/autograd/init.cpp
-  // Here we directly initialize the UTHPVariableClass.
+  // Here we directly initialize the UPTVariableClass.
   // Nothing to do here - Everything can be statically initialized?
 }
 

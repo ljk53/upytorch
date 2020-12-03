@@ -17,7 +17,7 @@ STATIC mp_rom_map_elem_t variable_locals_table[] = {
 MP_DEFINE_CONST_DICT(variable_locals, variable_locals_table);
 
 // THPVariableClass
-mp_obj_type_t UTHPVariableClass = {
+mp_obj_type_t UPTVariableClass = {
   .base = { &mp_type_type },
   .name = MP_QSTR_Tensor,
   .print = UPTVariable_print,
@@ -37,7 +37,7 @@ STATIC mp_rom_map_elem_t module_globals_table[] = {
   { MP_ROM_QSTR(MP_QSTR___name__), MP_ROM_QSTR(MP_QSTR_torch) },
   { MP_ROM_QSTR(MP_QSTR___init__), MP_ROM_PTR(&init_module_obj) },
 
-  { MP_ROM_QSTR(MP_QSTR_Tensor), MP_ROM_PTR(&UTHPVariableClass) },
+  { MP_ROM_QSTR(MP_QSTR_Tensor), MP_ROM_PTR(&UPTVariableClass) },
 
   { MP_ROM_QSTR(MP_QSTR_ones), MP_ROM_PTR(&UPTVariable_ones_obj) },
   { MP_ROM_QSTR(MP_QSTR_add), MP_ROM_PTR(&UPTVariable_add_obj) },
