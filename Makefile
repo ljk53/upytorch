@@ -26,7 +26,8 @@ CPPFLAGS = \
 	-I $(UPY_PORT_DIR)/build \
 	-I $(UPY_PORT_DIR)/variants/$(VARIANT) \
 	-I $(LIBTORCH_DIR)/include \
-	-I $(LIBTORCH_DIR)/include/torch/csrc/api/include
+	-I $(LIBTORCH_DIR)/include/torch/csrc/api/include \
+	-I $(BUILD_ROOT)
 
 LIBTORCH_LDFLAGS = \
 	-L $(LIBTORCH_DIR)/lib \
@@ -53,7 +54,7 @@ UPYFLAGSS = \
 	CFLAGS_EXTRA="-DMODULE_TORCH_ENABLED=1 -DMICROPY_MODULE_BUILTIN_INIT=1" \
 	LDFLAGS_EXTRA="$(LIBTORCH_LDFLAGS)"
 
-all: upytorch
+all: $(PROG)
 
 $(BUILD_ROOT)/linux:
 	mkdir -p $(BUILD_ROOT)
@@ -65,17 +66,23 @@ $(BUILD_ROOT)/local:
 	mkdir -p $(BUILD_ROOT)/local
 	ln -s $(PYTORCH_ROOT)/torch $(BUILD_ROOT)/local/libtorch
 
-wrapper/libwrapper.a: $(BUILD_ROOT)/$(LIBTORCH) wrapper/*.h wrapper/*.c wrapper/*.cpp
-	$(MAKEUPY) $(UPYFLAGSS) build/genhdr/qstrdefs.generated.h
-	$(CXX) $(CPPFLAGS) -c wrapper/upt_torch_functions.cpp -o wrapper/upt_torch_functions.o
-	$(CXX) $(CPPFLAGS) -c wrapper/upt_variable.cpp -o wrapper/upt_variable.o
-	$(AR) rcs wrapper/libwrapper.a wrapper/upt_torch_functions.o wrapper/upt_variable.o
+SRCS = $(wildcard wrapper/*.cpp)
+OBJS = $(patsubst %.cpp,%.o,$(SRCS))
 
-upytorch: wrapper/libwrapper.a
+$(BUILD_ROOT)/genhdr/qstrdefs.generated.h: wrapper/cmodule.c $(SRCS)
+	$(MAKEUPY) $(UPYFLAGSS) $(BUILD_ROOT)/genhdr/qstrdefs.generated.h
+
+%.o: %.cpp $(BUILD_ROOT)/$(LIBTORCH) wrapper/*.h $(BUILD_ROOT)/genhdr/qstrdefs.generated.h
+	$(CXX) $(CPPFLAGS) -c $< -o $@
+
+wrapper/libwrapper.a: $(OBJS)
+	$(AR) rcs wrapper/libwrapper.a $(OBJS)
+
+$(PROG): wrapper/libwrapper.a
 	$(MAKEUPYCROSS)
 	$(MAKEUPY) $(UPYFLAGSS) all
 
-test: upytorch
+test: $(PROG)
 	MICROPY_MICROPYTHON=$(PROG) \
 	python3 $(UPY_DIR)/tests/run-tests --keep-path -d $(CURDIR)/tests
 
