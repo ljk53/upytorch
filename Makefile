@@ -30,6 +30,10 @@ CPPFLAGS = \
 	-I $(LIBTORCH_DIR)/include/torch/csrc/api/include \
 	-I $(BUILD_ROOT)
 
+ifeq ($(DEBUG), 1)
+CPPFLAGS += -g
+endif
+
 LIBTORCH_LDFLAGS = \
 	-L $(LIBTORCH_DIR)/lib \
 	-Wl,-rpath,$(LIBTORCH_DIR)/lib \
