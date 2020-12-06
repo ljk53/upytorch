@@ -10,6 +10,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include "type_utils.h"
+
 namespace torch {
 
 static std::unordered_map<std::string, ParameterType> type_map = {
@@ -134,14 +136,6 @@ bool is_tensor(mp_obj_t obj) {
 //   return true;
 // }
 
-inline bool checkScalar(mp_obj_t obj) {
-  return mp_obj_is_bool(obj) || mp_obj_is_int(obj) || mp_obj_is_float(obj);
-}
-
-inline bool checkIndex(mp_obj_t obj) {
-  return mp_obj_is_int(obj);
-}
-
 // argnum is needed for raising the TypeError, it's used in the error message.
 auto FunctionParameter::check(mp_obj_t obj, int argnum) -> bool
 {
@@ -155,7 +149,7 @@ auto FunctionParameter::check(mp_obj_t obj, int argnum) -> bool
     case ParameterType::SCALAR:
     case ParameterType::COMPLEX:
     case ParameterType::DOUBLE: {
-      if (mp_obj_is_float(obj) || mp_obj_is_int(obj)) {
+      if (isFloat(obj) || isInt(obj)) {
         return true;
       }
       if (UPTVariable_Check(obj)) {
@@ -165,7 +159,7 @@ auto FunctionParameter::check(mp_obj_t obj, int argnum) -> bool
       return false;
     }
     case ParameterType::INT64: {
-      if (mp_obj_is_int(obj)) {
+      if (isInt(obj)) {
         return true;
       }
       if (UPTVariable_Check(obj)) {
@@ -186,15 +180,15 @@ auto FunctionParameter::check(mp_obj_t obj, int argnum) -> bool
     //   return is_tensor_list(obj, argnum, true /* throw_error */);
     // }
     case ParameterType::INT_LIST: {
-      if (mp_obj_is_type(obj, &mp_type_tuple) || mp_obj_is_type(obj, &mp_type_list)) {
+      if (isTuple(obj) || isList(obj)) {
         return true;
       }
       // if a size is specified (e.g. IntArrayRef[2]) we also allow passing a single int
-      return size > 0 && mp_obj_is_int(obj);
+      return size > 0 && isInt(obj);
     }
     // case ParameterType::FLOAT_LIST: return is_float_or_complex_list(obj);
     // case ParameterType::GENERATOR: return THPGenerator_Check(obj);
-    // case ParameterType::BOOL: return PyBool_Check(obj);
+    case ParameterType::BOOL: return isBool(obj);
     // case ParameterType::STORAGE: return isStorage(obj);
     // case ParameterType::SCALARTYPE: return THPDtype_Check(obj) || THPPythonScalarType_Check(obj);
     // case ParameterType::LAYOUT: return THPLayout_Check(obj);
@@ -590,7 +584,7 @@ bool FunctionSignature::parse(mp_obj_t self, size_t n_args, const mp_obj_t* args
 
   int i = 0;
   for (auto& param : params) {
-    mp_obj_t obj = MP_OBJ_FROM_PTR(nullptr);
+    mp_obj_t obj = getNull();
     bool is_kwd = false;
     if (arg_pos < nargs) {
       // extra positional args given after single positional IntArrayRef arg
@@ -612,9 +606,9 @@ bool FunctionSignature::parse(mp_obj_t self, size_t n_args, const mp_obj_t* args
       is_kwd = true;
     }
 
-    if ((!MP_OBJ_TO_PTR(obj) && param.optional) || (obj == mp_const_none && param.allow_none)) {
+    if ((isNull(obj) && param.optional) || (isNone(obj) && param.allow_none)) {
       dst[i++] = nullptr;
-    } else if (!MP_OBJ_TO_PTR(obj)) {
+    } else if (isNull(obj)) {
       if (raise_exception) {
         // foo() missing 1 required positional argument: "b"
         missing_args(*this, i);
@@ -736,7 +730,7 @@ std::vector<std::string> PythonArgParser::get_signatures() const {
 
 at::Tensor PythonArgs::tensor_slow(int i) {
   mp_obj_t obj = args[i];
-  if (!MP_OBJ_TO_PTR(obj)) {
+  if (isNull(obj)) {
     return at::Tensor();
   }
   if (UPTVariable_Check(obj)) {
@@ -744,12 +738,12 @@ at::Tensor PythonArgs::tensor_slow(int i) {
   }
 
   at::Scalar scalar;
-  if (mp_obj_is_bool(obj)) {
-    scalar = at::Scalar(obj == mp_const_true);
-  } else if (mp_obj_is_int(obj)) {
-    scalar = at::Scalar(mp_obj_get_int(obj));
-  } else if (mp_obj_is_float(obj)) {
-    scalar = at::Scalar(mp_obj_get_float(obj));
+  if (isBool(obj)) {
+    scalar = at::Scalar(unpackBool(obj));
+  } else if (isInt(obj)) {
+    scalar = at::Scalar(unpackInt(obj));
+  } else if (isFloat(obj)) {
+    scalar = at::Scalar(unpackFloat(obj));
   } else {
     TORCH_CHECK(false, "expected Tensor as argument %d", i);
   }
@@ -765,15 +759,15 @@ at::Scalar PythonArgs::scalar_slow(int i) {
     return ((UPTVariable*)args[i])->cdata.item();
   }
 
-  if (mp_obj_is_int(args[i])) {
-    return at::Scalar(static_cast<int64_t>(mp_obj_get_int(args[i])));
+  if (isInt(args[i])) {
+    return at::Scalar(static_cast<int64_t>(unpackInt(args[i])));
   }
 
-  if (mp_obj_is_bool(args[i])) {
-    return at::Scalar(args[i] == mp_const_true);
+  if (isBool(args[i])) {
+    return at::Scalar(unpackBool(args[i]));
   }
 
-  return at::Scalar(mp_obj_get_float(args[i]));
+  return at::Scalar(unpackFloat(args[i]));
 }
 
 } // namespace torch

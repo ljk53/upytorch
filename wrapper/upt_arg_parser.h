@@ -13,6 +13,7 @@
 #include <torch/csrc/autograd/variable.h>
 
 #include "upt_variable.h"
+#include "type_utils.h"
 
 extern "C" {
 #include "py/obj.h"
@@ -91,9 +92,9 @@ struct PythonArgs {
 
   inline std::string get_func_name();
   inline at::Tensor tensor(int i);
-//   inline c10::optional<at::Tensor> optionalTensor(int i);
+  inline c10::optional<at::Tensor> optionalTensor(int i);
   inline at::Scalar scalar(int i);
-//   inline at::Scalar scalarWithDefault(int i, at::Scalar default_scalar);
+  inline at::Scalar scalarWithDefault(int i, at::Scalar default_scalar);
 //   inline std::vector<at::Tensor> tensorlist(int i);
 //   template<int N>
 //   inline std::array<at::Tensor, N> tensorlist_n(int i);
@@ -105,11 +106,11 @@ struct PythonArgs {
 //   inline c10::Stream stream(int i);
 //   inline at::ScalarType scalartype(int i);
 //   inline at::ScalarType scalartypeWithDefault(int i, at::ScalarType default_scalartype);
-//   inline c10::optional<at::ScalarType> scalartypeOptional(int i);
-//   inline c10::optional<at::Scalar> scalarOptional(int i);
-//   inline c10::optional<int64_t> toInt64Optional(int i);
+  inline c10::optional<at::ScalarType> scalartypeOptional(int i);
+  inline c10::optional<at::Scalar> scalarOptional(int i);
+  inline c10::optional<int64_t> toInt64Optional(int i);
   inline c10::optional<bool> toBoolOptional(int i);
-//   inline c10::optional<double> toDoubleOptional(int i);
+  inline c10::optional<double> toDoubleOptional(int i);
 //   inline c10::OptionalArray<double> doublelistOptional(int i);
 //   inline std::vector<double> doublelist(int i);
 //   inline std::vector<double> getDoublelist(int i);
@@ -123,15 +124,15 @@ struct PythonArgs {
 //   inline std::vector<at::Dimname> dimnamelist(int i);
 //   inline c10::optional<std::vector<at::Dimname>> toDimnameListOptional(int i);
 //   inline at::MemoryFormat memoryformat(int i);
-//   inline c10::optional<at::MemoryFormat> memoryformatOptional(int i);
+  inline c10::optional<at::MemoryFormat> memoryformatOptional(int i);
 //   inline at::QScheme toQScheme(int i);
 //   inline std::string string(int i);
 //   inline std::string stringWithDefault(int i, const std::string& default_str);
 //   inline c10::optional<std::string> stringOptional(int i);
-//   inline int64_t toInt64(int i);
-//   inline int64_t toInt64WithDefault(int i, int64_t default_int);
-//   inline double toDouble(int i);
-//   inline double toDoubleWithDefault(int i, double default_double);
+  inline int64_t toInt64(int i);
+  inline int64_t toInt64WithDefault(int i, int64_t default_int);
+  inline double toDouble(int i);
+  inline double toDoubleWithDefault(int i, double default_double);
 //   inline c10::complex<double> toComplex(int i);
 //   inline c10::complex<double> toComplexWithDefault(int i, c10::complex<double> default_complex);
   inline bool toBool(int i);
@@ -200,32 +201,32 @@ inline at::Tensor PythonArgs::tensor(int i) {
   return tensor_slow(i);
 }
 
-// inline c10::optional<at::Tensor> PythonArgs::optionalTensor(int i) {
-//   at::Tensor t = tensor(i);
-//   if (t.defined()) {
-//     return t;
-//   } else {
-//     return c10::nullopt;
-//   }
-// }
+inline c10::optional<at::Tensor> PythonArgs::optionalTensor(int i) {
+  at::Tensor t = tensor(i);
+  if (t.defined()) {
+    return t;
+  } else {
+    return c10::nullopt;
+  }
+}
 
 inline at::Scalar PythonArgs::scalar(int i) {
-  if (!args[i]) return signature.params[i].default_scalar;
+  if (isNull(args[i])) return signature.params[i].default_scalar;
   return scalar_slow(i);
 }
 
-// inline at::Scalar PythonArgs::scalarWithDefault(int i, at::Scalar default_scalar) {
-//   if (!args[i]) return default_scalar;
-//   return scalar_slow(i);
-// }
+inline at::Scalar PythonArgs::scalarWithDefault(int i, at::Scalar default_scalar) {
+  if (isNull(args[i])) return default_scalar;
+  return scalar_slow(i);
+}
 
-// inline c10::optional<at::Scalar> PythonArgs::scalarOptional(int i) {
-//   if (!args[i]) return c10::nullopt;
-//   return scalar_slow(i);
-// }
+inline c10::optional<at::Scalar> PythonArgs::scalarOptional(int i) {
+  if (isNull(args[i])) return c10::nullopt;
+  return scalar_slow(i);
+}
 
 // inline std::vector<at::Tensor> PythonArgs::tensorlist(int i) {
-//   if (!args[i]) return std::vector<at::Tensor>();
+//   if (isNull(args[i])) return std::vector<at::Tensor>();
 //   auto tuple = six::isTuple(args[i]);
 //   THPObjectPtr arg = six::maybeAsTuple(args[i]);
 //   auto size = tuple ? PyTuple_GET_SIZE(arg.get()) : PyList_GET_SIZE(arg.get());
@@ -242,7 +243,7 @@ inline at::Scalar PythonArgs::scalar(int i) {
 // template<int N>
 // inline std::array<at::Tensor, N> PythonArgs::tensorlist_n(int i) {
 //   auto res = std::array<at::Tensor, N>();
-//   if (!args[i]) return res;
+//   if (isNull(args[i])) return res;
 //   auto tuple = six::isTuple(args[i]);
 //   THPObjectPtr arg = six::maybeAsTuple(args[i]);
 //   auto size = tuple ? PyTuple_GET_SIZE(arg.get()) : PyList_GET_SIZE(arg.get());
@@ -262,15 +263,11 @@ inline std::vector<int64_t> PythonArgs::intlist(int i) {
   return intlistWithDefault(i, signature.params[i].default_intlist);
 }
 
-inline int64_t unpackIndex(mp_obj_t i) {
-  return mp_obj_get_int(i);
-}
-
 inline std::vector<int64_t> PythonArgs::intlistWithDefault(int i, std::vector<int64_t> default_intlist) {
-  if (!args[i]) return default_intlist;
+  if (isNull(args[i])) return default_intlist;
   mp_obj_t arg = args[i];
   auto size = signature.params[i].size;
-  if (size > 0 && mp_obj_is_int(arg)) {
+  if (size > 0 && isInt(arg)) {
     return std::vector<int64_t>(size, unpackIndex(arg));
   }
   size_t len;
@@ -291,7 +288,7 @@ inline std::vector<int64_t> PythonArgs::intlistWithDefault(int i, std::vector<in
 }
 
 inline c10::OptionalArray<int64_t> PythonArgs::intlistOptional(int i) {
-  if (!args[i]) {
+  if (isNull(args[i])) {
     return {};
   }
   return intlist(i);
@@ -316,26 +313,26 @@ inline c10::OptionalArray<int64_t> PythonArgs::intlistOptional(int i) {
 // }
 
 // inline c10::OptionalArray<double> PythonArgs::doublelistOptional(int i) {
-//   if (!args[i]) {
+//   if (isNull(args[i])) {
 //     return {};
 //   }
 //   return this->getDoublelist(i);
 // }
 
 // inline std::vector<double> PythonArgs::doublelist(int i) {
-//   if (!args[i]) {
+//   if (isNull(args[i])) {
 //     return {};
 //   }
 //   return this->getDoublelist(i);
 // }
 
 // inline at::ScalarType PythonArgs::scalartypeWithDefault(int i, at::ScalarType default_scalartype) {
-//   if (!args[i]) return default_scalartype;
+//   if (isNull(args[i])) return default_scalartype;
 //   return scalartype(i);
 // }
 
 // inline at::ScalarType PythonArgs::scalartype(int i) {
-//   if (!args[i]) {
+//   if (isNull(args[i])) {
 //     auto scalartype = signature.params[i].default_scalartype;
 //     return (scalartype == at::ScalarType::Undefined) ?
 //             torch::tensors::get_default_scalar_type() : scalartype;
@@ -353,29 +350,30 @@ inline c10::OptionalArray<int64_t> PythonArgs::intlistOptional(int i) {
 //   return reinterpret_cast<THPDtype*>(obj)->scalar_type;
 // }
 
-// inline c10::optional<at::ScalarType> PythonArgs::scalartypeOptional(int i) {
-//   if (!args[i])
+inline c10::optional<at::ScalarType> PythonArgs::scalartypeOptional(int i) {
+  return c10::nullopt;
+//   if (isNull(args[i]))
 //     return c10::nullopt;
 //   return scalartype(i);
-// }
+}
 
 // inline at::Layout PythonArgs::layout(int i) {
-//   if (!args[i]) return signature.params[i].default_layout;
+//   if (isNull(args[i])) return signature.params[i].default_layout;
 //   return reinterpret_cast<THPLayout*>(args[i])->layout;
 // }
 
 // inline at::Layout PythonArgs::layoutWithDefault(int i, at::Layout default_layout) {
-//   if (!args[i]) return default_layout;
+//   if (isNull(args[i])) return default_layout;
 //   return layout(i);
 // }
 
 // inline c10::optional<at::Layout> PythonArgs::layoutOptional(int i) {
-//   if (!args[i]) return c10::nullopt;
+//   if (isNull(args[i])) return c10::nullopt;
 //   return layout(i);
 // }
 
 // inline at::Device PythonArgs::device(int i) {
-//   if (!args[i]) {
+//   if (isNull(args[i])) {
 //     return at::Device(backendToDeviceType(dispatchKeyToBackend(torch::tensors::get_default_dispatch_key())));
 //   }
 //   if (THPDevice_Check(args[i])) {
@@ -392,12 +390,12 @@ inline c10::OptionalArray<int64_t> PythonArgs::intlistOptional(int i) {
 // }
 
 // inline at::Device PythonArgs::deviceWithDefault(int i, const at::Device& default_device) {
-//   if (!args[i]) return default_device;
+//   if (isNull(args[i])) return default_device;
 //   return device(i);
 // }
 
 // inline c10::optional<at::Device> PythonArgs::deviceOptional(int i) {
-//   if (!args[i])
+//   if (isNull(args[i]))
 //     return c10::nullopt;
 //   return device(i);
 // }
@@ -420,7 +418,7 @@ inline c10::OptionalArray<int64_t> PythonArgs::intlistOptional(int i) {
 // }
 
 // inline c10::optional<std::vector<at::Dimname>> PythonArgs::toDimnameListOptional(int i) {
-//   if (!args[i]) return c10::nullopt;
+//   if (isNull(args[i])) return c10::nullopt;
 //   return parseDimnameList(args[i]);
 // }
 
@@ -436,20 +434,21 @@ inline c10::OptionalArray<int64_t> PythonArgs::intlistOptional(int i) {
 // }
 
 // inline at::MemoryFormat PythonArgs::memoryformat(int i) {
-//   if (!args[i]) return at::MemoryFormat::Contiguous;
+//   if (isNull(args[i])) return at::MemoryFormat::Contiguous;
 //   TORCH_CHECK(THPMemoryFormat_Check(args[i]), "memory_format arg must be an instance of the torch.memory_format");
 //   const auto memory_format = reinterpret_cast<THPMemoryFormat*>(args[i]);
 //   return memory_format->memory_format;
 // }
 
-// inline c10::optional<at::MemoryFormat> PythonArgs::memoryformatOptional(int i) {
-//   if (!args[i])
+inline c10::optional<at::MemoryFormat> PythonArgs::memoryformatOptional(int i) {
+  return c10::nullopt;
+//   if (isNull(args[i]))
 //     return c10::nullopt;
 //   return memoryformat(i);
-// }
+}
 
 // inline at::QScheme PythonArgs::toQScheme(int i) {
-//   if (!args[i]) return at::kPerTensorAffine;
+//   if (isNull(args[i])) return at::kPerTensorAffine;
 //   TORCH_CHECK(THPQScheme_Check(args[i]), "qscheme arg must be an instance of the torch.qscheme");
 //   const auto qscheme = reinterpret_cast<THPQScheme*>(args[i]);
 //   return qscheme->qscheme;
@@ -460,93 +459,93 @@ inline c10::OptionalArray<int64_t> PythonArgs::intlistOptional(int i) {
 // }
 
 // inline std::string PythonArgs::stringWithDefault(int i, const std::string& default_str) {
-//   if (!args[i]) return default_str;
+//   if (isNull(args[i])) return default_str;
 //   return THPUtils_unpackString(args[i]);
 // }
 
 // inline c10::optional<std::string> PythonArgs::stringOptional(int i) {
-//   if (!args[i]) return c10::nullopt;
+//   if (isNull(args[i])) return c10::nullopt;
 //   return THPUtils_unpackString(args[i]);
 // }
 
-// inline int64_t PythonArgs::toInt64(int i) {
-//   if (!args[i]) return signature.params[i].default_int;
-//   return THPUtils_unpackLong(args[i]);
-// }
+inline int64_t PythonArgs::toInt64(int i) {
+  if (isNull(args[i])) return signature.params[i].default_int;
+  return unpackInt(args[i]);
+}
 
-// inline int64_t PythonArgs::toInt64WithDefault(int i, int64_t default_int) {
-//   if (!args[i]) return default_int;
-//   return toInt64(i);
-// }
+inline int64_t PythonArgs::toInt64WithDefault(int i, int64_t default_int) {
+  if (isNull(args[i])) return default_int;
+  return toInt64(i);
+}
 
-// inline c10::optional<int64_t> PythonArgs::toInt64Optional(int i) {
-//   if (!args[i])
-//     return c10::nullopt;
-//   return toInt64(i);
-// }
+inline c10::optional<int64_t> PythonArgs::toInt64Optional(int i) {
+  if (isNull(args[i]))
+    return c10::nullopt;
+  return toInt64(i);
+}
 
 inline c10::optional<bool> PythonArgs::toBoolOptional(int i) {
-  if (!MP_OBJ_TO_PTR(args[i])) {
+  if (isNull(args[i])) {
     return c10::nullopt;
   }
   return toBool(i);
 }
 
-// inline c10::optional<double> PythonArgs::toDoubleOptional(int i) {
-//   if (!args[i]) {
-//     return c10::nullopt;
-//   }
-//   return toDouble(i);
-// }
+inline c10::optional<double> PythonArgs::toDoubleOptional(int i) {
+  if (isNull(args[i])) {
+    return c10::nullopt;
+  }
+  return toDouble(i);
+}
 
-// inline double PythonArgs::toDouble(int i) {
-//   if (!args[i]) return signature.params[i].default_double;
-//   return THPUtils_unpackDouble(args[i]);
-// }
+inline double PythonArgs::toDouble(int i) {
+  if (isNull(args[i])) return signature.params[i].default_double;
+  return unpackFloat(args[i]);
+}
 
-// inline double PythonArgs::toDoubleWithDefault(int i, double default_double) {
-//   if (!args[i]) return default_double;
-//   return toDouble(i);
-// }
+inline double PythonArgs::toDoubleWithDefault(int i, double default_double) {
+  if (isNull(args[i])) return default_double;
+  return toDouble(i);
+}
 
 // inline c10::complex<double> PythonArgs::toComplex(int i) {
 //   c10::complex<double> default_value = *const_cast<c10::complex<double> *>(
 //     reinterpret_cast<const c10::complex<double> *>(signature.params[i].default_complex));
-//   if (!args[i]) return default_value;
+//   if (isNull(args[i])) return default_value;
 //   return THPUtils_unpackComplexDouble(args[i]);
 // }
 
 // inline c10::complex<double> PythonArgs::toComplexWithDefault(int i, c10::complex<double> default_value) {
-//   if (!args[i]) return default_value;
+//   if (isNull(args[i])) return default_value;
 //   return toComplex(i);
 // }
 
 inline bool PythonArgs::toBool(int i) {
-  if (!MP_OBJ_TO_PTR(args[i])) return signature.params[i].default_bool;
-  return args[i] == mp_const_true;
+  if (isNull(args[i])) return signature.params[i].default_bool;
+  return unpackBool(args[i]);
 }
 
 inline bool PythonArgs::toBoolWithDefault(int i, bool default_bool) {
-  if (!MP_OBJ_TO_PTR(args[i])) return default_bool;
+  if (isNull(args[i])) return default_bool;
   return toBool(i);
 }
 
 inline bool PythonArgs::isNone(int i) {
-  return MP_OBJ_TO_PTR(args[i]) == nullptr;
+  return isNull(args[i]);
 }
 
 // inline c10::optional<at::Generator> PythonArgs::generator(int i) {
-//   if (!args[i]) return c10::nullopt;
+//   if (isNull(args[i])) return c10::nullopt;
 //   return reinterpret_cast<THPGenerator*>(args[i])->cdata;
 // }
 
 // inline at::Storage PythonArgs::storage(int i) {
-//   if (!args[i]) return at::Storage();
+//   if (isNull(args[i])) return at::Storage();
 //   return createStorage(args[i]);
 // }
 
 // inline c10::Stream PythonArgs::stream(int i) {
-//   if (!args[i]) return c10::Stream(c10::Stream::Default::DEFAULT, c10::Device(DeviceType::CPU, -1));
+//   if (isNull(args[i])) return c10::Stream(c10::Stream::Default::DEFAULT, c10::Device(DeviceType::CPU, -1));
 //   if (!THPStream_Check(args[i])) {
 //     TORCH_CHECK(false, "expected Stream object. Got '%s'", Py_TYPE(args[i])->tp_name);
 //   }
