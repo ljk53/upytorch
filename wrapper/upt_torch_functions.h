@@ -1,6 +1,7 @@
 #pragma once
 
-#include "py/obj.h"
+#define FOR_ALL_TORCH_FUNCTIONS(ARGS_ONLY, WITH_KWARGS) \
+    WITH_KWARGS(ones, 1) \
+    WITH_KWARGS(add, 2) \
 
-extern mp_obj_t UPTVariable_ones(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args);
-extern mp_obj_t UPTVariable_add(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args);
+// END

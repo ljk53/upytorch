@@ -3,6 +3,14 @@
 
 #include "upt_torch_functions.h"
 
+#define DECL_FUNS_ARGS(NAME, ARGS) \
+extern mp_obj_t UPTVariable_##NAME(size_t n_args, const mp_obj_t* args);
+
+#define DECL_FUNS_KW(NAME, ARGS) \
+extern mp_obj_t UPTVariable_##NAME(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args);
+
+FOR_ALL_TORCH_FUNCTIONS(DECL_FUNS_ARGS, DECL_FUNS_KW)
+
 extern mp_obj_module_t module;
 
 extern void UPTVariable_initModule();
@@ -30,8 +38,15 @@ STATIC mp_obj_t init_module() {
 }
 STATIC MP_DEFINE_CONST_FUN_OBJ_0(init_module_obj, init_module);
 
-STATIC MP_DEFINE_CONST_FUN_OBJ_KW(UPTVariable_ones_obj, 1, UPTVariable_ones);
-STATIC MP_DEFINE_CONST_FUN_OBJ_KW(UPTVariable_add_obj, 1, UPTVariable_add);
+#define DEFINE_FUN_OBJ_ARGS(NAME, ARGS)
+#define DEFINE_FUN_OBJ_KW(NAME, ARGS) \
+STATIC MP_DEFINE_CONST_FUN_OBJ_KW(UPTVariable_##NAME##_obj, ARGS, UPTVariable_##NAME);
+
+FOR_ALL_TORCH_FUNCTIONS(DEFINE_FUN_OBJ_ARGS, DEFINE_FUN_OBJ_KW)
+
+#define DEFINE_GLOBAL_ENTRY_ARGS(NAME, ARGS)
+#define DEFINE_GLOBAL_ENTRY_KW(NAME, ARGS) \
+{ MP_ROM_QSTR(MP_QSTR_##NAME), MP_ROM_PTR(&UPTVariable_##NAME##_obj) },
 
 STATIC mp_rom_map_elem_t module_globals_table[] = {
   { MP_ROM_QSTR(MP_QSTR___name__), MP_ROM_QSTR(MP_QSTR_torch) },
@@ -39,8 +54,7 @@ STATIC mp_rom_map_elem_t module_globals_table[] = {
 
   { MP_ROM_QSTR(MP_QSTR_Tensor), MP_ROM_PTR(&UPTVariableClass) },
 
-  { MP_ROM_QSTR(MP_QSTR_ones), MP_ROM_PTR(&UPTVariable_ones_obj) },
-  { MP_ROM_QSTR(MP_QSTR_add), MP_ROM_PTR(&UPTVariable_add_obj) },
+  FOR_ALL_TORCH_FUNCTIONS(DEFINE_GLOBAL_ENTRY_ARGS, DEFINE_GLOBAL_ENTRY_KW)
 };
 MP_DEFINE_CONST_DICT(module_globals, module_globals_table);
 
