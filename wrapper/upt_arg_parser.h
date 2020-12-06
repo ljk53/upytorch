@@ -108,7 +108,7 @@ struct PythonArgs {
 //   inline c10::optional<at::ScalarType> scalartypeOptional(int i);
 //   inline c10::optional<at::Scalar> scalarOptional(int i);
 //   inline c10::optional<int64_t> toInt64Optional(int i);
-//   inline c10::optional<bool> toBoolOptional(int i);
+  inline c10::optional<bool> toBoolOptional(int i);
 //   inline c10::optional<double> toDoubleOptional(int i);
 //   inline c10::OptionalArray<double> doublelistOptional(int i);
 //   inline std::vector<double> doublelist(int i);
@@ -134,8 +134,8 @@ struct PythonArgs {
 //   inline double toDoubleWithDefault(int i, double default_double);
 //   inline c10::complex<double> toComplex(int i);
 //   inline c10::complex<double> toComplexWithDefault(int i, c10::complex<double> default_complex);
-//   inline bool toBool(int i);
-//   inline bool toBoolWithDefault(int i, bool default_bool);
+  inline bool toBool(int i);
+  inline bool toBoolWithDefault(int i, bool default_bool);
   inline bool isNone(int i);
 
 private:
@@ -485,12 +485,12 @@ inline c10::OptionalArray<int64_t> PythonArgs::intlistOptional(int i) {
 //   return toInt64(i);
 // }
 
-// inline c10::optional<bool> PythonArgs::toBoolOptional(int i) {
-//   if (!args[i]) {
-//     return c10::nullopt;
-//   }
-//   return toBool(i);
-// }
+inline c10::optional<bool> PythonArgs::toBoolOptional(int i) {
+  if (!MP_OBJ_TO_PTR(args[i])) {
+    return c10::nullopt;
+  }
+  return toBool(i);
+}
 
 // inline c10::optional<double> PythonArgs::toDoubleOptional(int i) {
 //   if (!args[i]) {
@@ -521,15 +521,15 @@ inline c10::OptionalArray<int64_t> PythonArgs::intlistOptional(int i) {
 //   return toComplex(i);
 // }
 
-// inline bool PythonArgs::toBool(int i) {
-//   if (!args[i]) return signature.params[i].default_bool;
-//   return args[i] == Py_True;
-// }
+inline bool PythonArgs::toBool(int i) {
+  if (!MP_OBJ_TO_PTR(args[i])) return signature.params[i].default_bool;
+  return args[i] == mp_const_true;
+}
 
-// inline bool PythonArgs::toBoolWithDefault(int i, bool default_bool) {
-//   if (!args[i]) return default_bool;
-//   return toBool(i);
-// }
+inline bool PythonArgs::toBoolWithDefault(int i, bool default_bool) {
+  if (!MP_OBJ_TO_PTR(args[i])) return default_bool;
+  return toBool(i);
+}
 
 inline bool PythonArgs::isNone(int i) {
   return MP_OBJ_TO_PTR(args[i]) == nullptr;
