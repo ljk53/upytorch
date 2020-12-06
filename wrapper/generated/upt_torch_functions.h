@@ -4,6 +4,25 @@
 
 #define FOR_ALL_TORCH_FUNCTIONS(ARGS_ONLY, WITH_KWARGS) \
 WITH_KWARGS(add, 2) \
+WITH_KWARGS(addmm, 3) \
+WITH_KWARGS(conv1d, 7) \
+WITH_KWARGS(conv2d, 7) \
+WITH_KWARGS(conv3d, 7) \
+WITH_KWARGS(conv_transpose1d, 8) \
+WITH_KWARGS(conv_transpose2d, 8) \
+WITH_KWARGS(conv_transpose3d, 8) \
+WITH_KWARGS(convolution, 9) \
+WITH_KWARGS(empty, 1) \
+WITH_KWARGS(empty_like, 1) \
+WITH_KWARGS(eye, 1) \
+WITH_KWARGS(mm, 2) \
+WITH_KWARGS(mul, 2) \
 WITH_KWARGS(ones, 1) \
+WITH_KWARGS(ones_like, 1) \
+WITH_KWARGS(rand, 1) \
+WITH_KWARGS(softmax, 3) \
+WITH_KWARGS(sum, 1) \
+WITH_KWARGS(zeros, 1) \
+WITH_KWARGS(zeros_like, 1) \
 
 // END

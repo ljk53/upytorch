@@ -36,11 +36,11 @@ def gen(
     functions = load_signatures(native_yaml_path, deprecated_yaml_path, method=False)
     create_upy_bindings(
         fm, functions,
-        lambda f: is_py_torch_function(f) and f.func.name.name.base in ['add', 'ones'],
+        lambda f: is_py_torch_function(f),
         'torch', 'upt_torch_functions.cpp', method=False)
     create_upy_bindings(
         fm, functions,
-        lambda f: is_py_torch_function(f) and f.func.name.name.base in ['add', 'ones'],
+        lambda f: is_py_torch_function(f),
         'torch', 'upt_torch_functions.h', method=False)
 
 def create_upy_bindings(

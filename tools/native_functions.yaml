@@ -23,5 +23,163 @@
     SparseCUDA: add_out_sparse_cuda
     MkldnnCPU: mkldnn_add_out
 
+- func: addmm.out(Tensor self, Tensor mat1, Tensor mat2, *, Scalar beta=1, Scalar alpha=1, Tensor(a!) out) -> Tensor(a!)
+  dispatch:
+    CPU: addmm_cpu_out
+    CUDA: addmm_out_cuda
+    SparseCPU: addmm_out_sparse_dense_cpu
+    SparseCUDA: addmm_out_sparse_dense_cuda
+
+- func: addmm(Tensor self, Tensor mat1, Tensor mat2, *, Scalar beta=1, Scalar alpha=1) -> Tensor
+  use_c10_dispatcher: full
+  variants: function, method
+  dispatch:
+    CPU: addmm_cpu
+    CUDA: addmm_cuda
+    SparseCPU: addmm_sparse_dense_cpu
+    SparseCUDA: addmm_sparse_dense_cuda
+
+- func: addmm_(Tensor(a!) self, Tensor mat1, Tensor mat2, *, Scalar beta=1, Scalar alpha=1) -> Tensor(a!)
+  use_c10_dispatcher: full
+  variants: method
+  dispatch:
+    CPU: addmm_cpu_
+    CUDA: addmm__cuda
+    # Warning!  For whatever reason, the inplace sparse addmm is NON
+    # broadcasting
+    SparseCPU: s_addmm_sparse_dense_cpu_
+    SparseCUDA: s_addmm_sparse_dense_cuda_
+
+- func: convolution(Tensor input, Tensor weight, Tensor? bias, int[] stride, int[] padding, int[] dilation, bool transposed, int[] output_padding, int groups) -> Tensor
+  use_c10_dispatcher: hacky_wrapper_for_legacy_signatures
+
+- func: conv1d(Tensor input, Tensor weight, Tensor? bias=None, int[1] stride=1, int[1] padding=0, int[1] dilation=1, int groups=1) -> Tensor
+  use_c10_dispatcher: hacky_wrapper_for_legacy_signatures
+
+- func: conv2d(Tensor input, Tensor weight, Tensor? bias=None, int[2] stride=1, int[2] padding=0, int[2] dilation=1, int groups=1) -> Tensor
+  use_c10_dispatcher: hacky_wrapper_for_legacy_signatures
+
+- func: conv3d(Tensor input, Tensor weight, Tensor? bias=None, int[3] stride=1, int[3] padding=0, int[3] dilation=1, int groups=1) -> Tensor
+  use_c10_dispatcher: hacky_wrapper_for_legacy_signatures
+
+# NB: we inherit the goofy argument order from PyTorch torch.nn.functional
+- func: conv_transpose1d(Tensor input, Tensor weight, Tensor? bias=None, int[1] stride=1, int[1] padding=0, int[1] output_padding=0, int groups=1, int[1] dilation=1) -> Tensor
+  use_c10_dispatcher: hacky_wrapper_for_legacy_signatures
+
+- func: conv_transpose2d.input(Tensor input, Tensor weight, Tensor? bias=None, int[2] stride=1, int[2] padding=0, int[2] output_padding=0, int groups=1, int[2] dilation=1) -> Tensor
+  use_c10_dispatcher: hacky_wrapper_for_legacy_signatures
+
+- func: conv_transpose3d.input(Tensor input, Tensor weight, Tensor? bias=None, int[3] stride=1, int[3] padding=0, int[3] output_padding=0, int groups=1, int[3] dilation=1) -> Tensor
+  use_c10_dispatcher: hacky_wrapper_for_legacy_signatures
+
+- func: empty.memory_format(int[] size, *, ScalarType? dtype=None, Layout? layout=None, Device? device=None, bool? pin_memory=None, MemoryFormat? memory_format=None) -> Tensor
+  use_c10_dispatcher: full
+  dispatch:
+    CPU: empty_cpu
+    CUDA: empty_cuda
+    MkldnnCPU: empty_mkldnn
+    SparseCPU, SparseCUDA: empty_sparse
+
+- func: empty.out(int[] size, *, MemoryFormat? memory_format=None, Tensor(a!) out) -> Tensor(a!)
+  device_guard: False
+
+- func: empty_like(Tensor self, *, ScalarType? dtype=None, Layout? layout=None, Device? device=None, bool? pin_memory=None, MemoryFormat? memory_format=None) -> Tensor
+  use_c10_dispatcher: hacky_wrapper_for_legacy_signatures
+  device_guard: False
+
+- func: eye(int n, *, ScalarType? dtype=None, Layout? layout=None, Device? device=None, bool? pin_memory=None) -> Tensor
+  use_c10_dispatcher: hacky_wrapper_for_legacy_signatures
+
+- func: eye.m(int n, int m, *, ScalarType? dtype=None, Layout? layout=None, Device? device=None, bool? pin_memory=None) -> Tensor
+  use_c10_dispatcher: hacky_wrapper_for_legacy_signatures
+
+- func: eye.out(int n, *, Tensor(a!) out) -> Tensor(a!)
+  dispatch:
+    CPU: eye_out_cpu
+    CUDA: eye_out_cuda
+
+- func: eye.m_out(int n, int m, *, Tensor(a!) out) -> Tensor(a!)
+  dispatch:
+    CPU: eye_out_cpu
+    CUDA: eye_out_cuda
+
+- func: mm(Tensor self, Tensor mat2) -> Tensor
+  use_c10_dispatcher: full
+  variants: function, method
+  dispatch:
+    CPU: mm_cpu
+    CUDA: mm_cuda
+    SparseCPU, SparseCUDA: _sparse_mm
+
+- func: mm.out(Tensor self, Tensor mat2, *, Tensor(a!) out) -> Tensor(a!)
+  dispatch:
+    CPU: mm_cpu_out
+    CUDA: mm_out_cuda
+    SparseCPU, SparseCUDA: _sparse_mm_out
+
+- func: mul.Tensor(Tensor self, Tensor other) -> Tensor
+  use_c10_dispatcher: full
+  variants: function, method
+  dispatch:
+    CPU, CUDA: mul
+    SparseCPU, SparseCUDA: mul_sparse
+    MkldnnCPU: mkldnn_mul
+
+- func: mul_.Tensor(Tensor(a!) self, Tensor other) -> Tensor(a!)
+  use_c10_dispatcher: full
+  variants: method
+  dispatch:
+    CPU, CUDA: mul_
+    SparseCPU, SparseCUDA: mul_sparse_
+    MkldnnCPU: mkldnn_mul_
+
+- func: mul.out(Tensor self, Tensor other, *, Tensor(a!) out) -> Tensor(a!)
+  dispatch:
+    CPU, CUDA: mul_out
+    SparseCPU: mul_out_sparse_cpu
+    SparseCUDA: mul_out_sparse_cuda
+    MkldnnCPU: mkldnn_mul_out
+
+  # For C++ only, until we have conversion from C++ numbers to Tensor
+- func: mul.Scalar(Tensor self, Scalar other) -> Tensor
+  use_c10_dispatcher: full
+  variants: function, method
+  dispatch:
+    DefaultBackend: mul
+
+- func: mul_.Scalar(Tensor(a!) self, Scalar other) -> Tensor(a!)
+  use_c10_dispatcher: full
+  variants: method
+  dispatch:
+    DefaultBackend: mul_
+
 - func: ones(int[] size, *, ScalarType? dtype=None, Layout? layout=None, Device? device=None, bool? pin_memory=None) -> Tensor
+  use_c10_dispatcher: hacky_wrapper_for_legacy_signatures
+
+- func: ones.out(int[] size, *, Tensor(a!) out) -> Tensor(a!)
+
+- func: ones_like(Tensor self, *, ScalarType? dtype=None, Layout? layout=None, Device? device=None, bool? pin_memory=None, MemoryFormat? memory_format=None) -> Tensor
+  use_c10_dispatcher: hacky_wrapper_for_legacy_signatures
+
+- func: rand(int[] size, *, ScalarType? dtype=None, Layout? layout=None, Device? device=None, bool? pin_memory=None) -> Tensor
+  use_c10_dispatcher: hacky_wrapper_for_legacy_signatures
+
+- func: rand.out(int[] size, *, Tensor(a!) out) -> Tensor(a!)
+
+- func: softmax.int(Tensor self, int dim, ScalarType? dtype=None) -> Tensor
+  use_c10_dispatcher: full
+  variants: function, method
+
+- func: sum(Tensor self, *, ScalarType? dtype=None) -> Tensor
+  use_c10_dispatcher: full
+  variants: function, method
+  dispatch:
+    CPU, CUDA: sum
+
+- func: zeros(int[] size, *, ScalarType? dtype=None, Layout? layout=None, Device? device=None, bool? pin_memory=None) -> Tensor
+  use_c10_dispatcher: hacky_wrapper_for_legacy_signatures
+
+- func: zeros.out(int[] size, *, Tensor(a!) out) -> Tensor(a!)
+
+- func: zeros_like(Tensor self, *, ScalarType? dtype=None, Layout? layout=None, Device? device=None, bool? pin_memory=None, MemoryFormat? memory_format=None) -> Tensor
   use_c10_dispatcher: hacky_wrapper_for_legacy_signatures
