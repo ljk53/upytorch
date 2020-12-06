@@ -1,7 +1,7 @@
 #include "py/obj.h"
 #include "py/objmodule.h"
 
-#include "upt_torch_functions.h"
+#include "generated/upt_torch_functions.h"
 
 #define DECL_FUNS_ARGS(NAME, ARGS) \
 extern mp_obj_t UPTVariable_##NAME(size_t n_args, const mp_obj_t* args);

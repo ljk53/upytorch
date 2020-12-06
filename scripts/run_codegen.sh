@@ -3,7 +3,7 @@
 set -eux -o pipefail
 
 ROOT="$( cd "$(dirname "$0")" ; pwd -P)/.."
-OUT=${OUT:-wrapper}
+OUT=${OUT:-wrapper/generated}
 
 cd "$ROOT"
 

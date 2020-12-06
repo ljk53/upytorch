@@ -28,6 +28,7 @@ CPPFLAGS = \
 	-I $(UPY_PORT_DIR)/variants/$(VARIANT) \
 	-I $(LIBTORCH_DIR)/include \
 	-I $(LIBTORCH_DIR)/include/torch/csrc/api/include \
+	-I wrapper \
 	-I $(BUILD_ROOT)
 
 ifeq ($(DEBUG), 1)
@@ -71,7 +72,7 @@ $(BUILD_ROOT)/local:
 	mkdir -p $(BUILD_ROOT)/local
 	ln -s $(PYTORCH_ROOT)/torch $(BUILD_ROOT)/local/libtorch
 
-SRCS = $(wildcard wrapper/*.cpp)
+SRCS = $(wildcard wrapper/*.cpp wrapper/generated/*.cpp)
 OBJS = $(patsubst %.cpp,%.o,$(SRCS))
 
 $(BUILD_ROOT)/genhdr/qstrdefs.generated.h: wrapper/cmodule.c $(SRCS)
@@ -94,4 +95,4 @@ test: $(PROG)
 clean:
 	$(MAKEUPY) clean
 	rm -rf build
-	rm -f wrapper/*.o wrapper/*.a wrapper/*.so
+	rm -f wrapper/*.o wrapper/*.a wrapper/*.so wrapper/generated/*.o

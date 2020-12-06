@@ -2,10 +2,6 @@
 
 // See: pytorch/torch/csrc/autograd/generated/python_torch_functions.cpp
 
-extern "C" {
-#include "upt_torch_functions.h"
-}
-
 #include <iostream>
 #include <torch/script.h>
 
