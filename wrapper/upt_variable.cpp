@@ -65,7 +65,7 @@ void UPTVariable_print(const mp_print_t* print, mp_obj_t self_, mp_print_kind_t 
 }
 
 // THPVariable_initModule
-void UPTVariable_initModule() {
+void UPTVariable_initModule(mp_obj_module_t* module) {
   // In PyTorch the native functions are bound to torch._C._TensorBase.
   // The torch.Tensor class is manually written python class at pytorch/torch/tensor.py.
   // The THPVariableClass is initialized in THPAutograd_initExtension @ pytorch/torch/csrc/autograd/init.cpp

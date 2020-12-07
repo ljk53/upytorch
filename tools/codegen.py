@@ -357,7 +357,7 @@ __{name} ? c10::make_optional(DimnameList(__{name}.value())) : c10::nullopt;',
 
         inits.append(f'''\
 const auto options = TensorOptions()
-    //.dtype({arg_parser_outputs['dtype'].expr})
+    .dtype({arg_parser_outputs['dtype'].expr})
     //.device({arg_parser_outputs['device'].expr})
     //.layout({arg_parser_outputs['layout'].expr})
     .requires_grad({arg_parser_outputs['requires_grad'].expr})

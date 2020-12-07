@@ -104,8 +104,8 @@ struct PythonArgs {
 //   inline c10::optional<at::Generator> generator(int i);
 //   inline at::Storage storage(int i);
 //   inline c10::Stream stream(int i);
-//   inline at::ScalarType scalartype(int i);
-//   inline at::ScalarType scalartypeWithDefault(int i, at::ScalarType default_scalartype);
+  inline at::ScalarType scalartype(int i);
+  inline at::ScalarType scalartypeWithDefault(int i, at::ScalarType default_scalartype);
   inline c10::optional<at::ScalarType> scalartypeOptional(int i);
   inline c10::optional<at::Scalar> scalarOptional(int i);
   inline c10::optional<int64_t> toInt64Optional(int i);
@@ -326,35 +326,24 @@ inline c10::OptionalArray<int64_t> PythonArgs::intlistOptional(int i) {
 //   return this->getDoublelist(i);
 // }
 
-// inline at::ScalarType PythonArgs::scalartypeWithDefault(int i, at::ScalarType default_scalartype) {
-//   if (isNull(args[i])) return default_scalartype;
-//   return scalartype(i);
-// }
+inline at::ScalarType PythonArgs::scalartypeWithDefault(int i, at::ScalarType default_scalartype) {
+  if (isNull(args[i])) return default_scalartype;
+  return scalartype(i);
+}
 
-// inline at::ScalarType PythonArgs::scalartype(int i) {
-//   if (isNull(args[i])) {
-//     auto scalartype = signature.params[i].default_scalartype;
-//     return (scalartype == at::ScalarType::Undefined) ?
-//             torch::tensors::get_default_scalar_type() : scalartype;
-//   }
-//   mp_obj_t *obj = args[i];
-//   if (obj == (mp_obj_t*)&PyFloat_Type) {
-//     return at::ScalarType::Double;
-//   }
-//   if (obj == (mp_obj_t*)&PyBool_Type) {
-//     return at::ScalarType::Bool;
-//   }
-//   if (obj == (mp_obj_t*)&PyLong_Type) {
-//     return at::ScalarType::Long;
-//   }
-//   return reinterpret_cast<THPDtype*>(obj)->scalar_type;
-// }
+inline at::ScalarType PythonArgs::scalartype(int i) {
+  if (isNull(args[i])) {
+    auto scalartype = signature.params[i].default_scalartype;
+    return (scalartype == at::ScalarType::Undefined) ?
+            get_default_scalar_type() : scalartype;
+  }
+  return unpackScalarType(args[i]);
+}
 
 inline c10::optional<at::ScalarType> PythonArgs::scalartypeOptional(int i) {
-  return c10::nullopt;
-//   if (isNull(args[i]))
-//     return c10::nullopt;
-//   return scalartype(i);
+  if (isNull(args[i]))
+    return c10::nullopt;
+  return scalartype(i);
 }
 
 // inline at::Layout PythonArgs::layout(int i) {

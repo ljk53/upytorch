@@ -281,7 +281,7 @@ mp_obj_t UPTVariable_empty(size_t n_args, const mp_obj_t* args, mp_map_t* kw_arg
   if (_r.isNone(2)) {
     // aten::empty.memory_format(int[] size, *, ScalarType? dtype=None, Layout? layout=None, Device? device=None, bool? pin_memory=None, MemoryFormat? memory_format=None) -> Tensor
     const auto options = TensorOptions()
-        //.dtype(_r.scalartype(3))
+        .dtype(_r.scalartype(3))
         //.device(_r.device(5))
         //.layout(_r.layoutOptional(4))
         .requires_grad(_r.toBool(7))
@@ -316,7 +316,7 @@ mp_obj_t UPTVariable_empty_like(size_t n_args, const mp_obj_t* args, mp_map_t* k
   // aten::empty_like(Tensor self, *, ScalarType? dtype=None, Layout? layout=None, Device? device=None, bool? pin_memory=None, MemoryFormat? memory_format=None) -> Tensor
   auto self = _r.tensor(0);
   const auto options = TensorOptions()
-      //.dtype(_r.scalartypeWithDefault(2, self.scalar_type()))
+      .dtype(_r.scalartypeWithDefault(2, self.scalar_type()))
       //.device(_r.deviceWithDefault(4, self.device()))
       //.layout(_r.layoutWithDefault(3, layout_from_backend(self.options().backend())))
       .requires_grad(_r.toBool(6))
@@ -346,7 +346,7 @@ mp_obj_t UPTVariable_eye(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args)
       if (_r.isNone(1)) {
         // aten::eye(int n, *, ScalarType? dtype=None, Layout? layout=None, Device? device=None, bool? pin_memory=None) -> Tensor
         const auto options = TensorOptions()
-            //.dtype(_r.scalartype(2))
+            .dtype(_r.scalartype(2))
             //.device(_r.device(4))
             //.layout(_r.layoutOptional(3))
             .requires_grad(_r.toBool(6))
@@ -372,7 +372,7 @@ mp_obj_t UPTVariable_eye(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args)
       if (_r.isNone(2)) {
         // aten::eye.m(int n, int m, *, ScalarType? dtype=None, Layout? layout=None, Device? device=None, bool? pin_memory=None) -> Tensor
         const auto options = TensorOptions()
-            //.dtype(_r.scalartype(3))
+            .dtype(_r.scalartype(3))
             //.device(_r.device(5))
             //.layout(_r.layoutOptional(4))
             .requires_grad(_r.toBool(7))
@@ -465,7 +465,7 @@ mp_obj_t UPTVariable_ones(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args
   if (_r.isNone(1)) {
     // aten::ones(int[] size, *, ScalarType? dtype=None, Layout? layout=None, Device? device=None, bool? pin_memory=None) -> Tensor
     const auto options = TensorOptions()
-        //.dtype(_r.scalartype(2))
+        .dtype(_r.scalartype(2))
         //.device(_r.device(4))
         //.layout(_r.layoutOptional(3))
         .requires_grad(_r.toBool(6))
@@ -500,7 +500,7 @@ mp_obj_t UPTVariable_ones_like(size_t n_args, const mp_obj_t* args, mp_map_t* kw
   // aten::ones_like(Tensor self, *, ScalarType? dtype=None, Layout? layout=None, Device? device=None, bool? pin_memory=None, MemoryFormat? memory_format=None) -> Tensor
   auto self = _r.tensor(0);
   const auto options = TensorOptions()
-      //.dtype(_r.scalartypeWithDefault(2, self.scalar_type()))
+      .dtype(_r.scalartypeWithDefault(2, self.scalar_type()))
       //.device(_r.deviceWithDefault(4, self.device()))
       //.layout(_r.layoutWithDefault(3, layout_from_backend(self.options().backend())))
       .requires_grad(_r.toBool(6))
@@ -526,7 +526,7 @@ mp_obj_t UPTVariable_rand(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args
   if (_r.isNone(1)) {
     // aten::rand(int[] size, *, ScalarType? dtype=None, Layout? layout=None, Device? device=None, bool? pin_memory=None) -> Tensor
     const auto options = TensorOptions()
-        //.dtype(_r.scalartype(2))
+        .dtype(_r.scalartype(2))
         //.device(_r.device(4))
         //.layout(_r.layoutOptional(3))
         .requires_grad(_r.toBool(6))
@@ -597,7 +597,7 @@ mp_obj_t UPTVariable_zeros(size_t n_args, const mp_obj_t* args, mp_map_t* kw_arg
   if (_r.isNone(1)) {
     // aten::zeros(int[] size, *, ScalarType? dtype=None, Layout? layout=None, Device? device=None, bool? pin_memory=None) -> Tensor
     const auto options = TensorOptions()
-        //.dtype(_r.scalartype(2))
+        .dtype(_r.scalartype(2))
         //.device(_r.device(4))
         //.layout(_r.layoutOptional(3))
         .requires_grad(_r.toBool(6))
@@ -632,7 +632,7 @@ mp_obj_t UPTVariable_zeros_like(size_t n_args, const mp_obj_t* args, mp_map_t* k
   // aten::zeros_like(Tensor self, *, ScalarType? dtype=None, Layout? layout=None, Device? device=None, bool? pin_memory=None, MemoryFormat? memory_format=None) -> Tensor
   auto self = _r.tensor(0);
   const auto options = TensorOptions()
-      //.dtype(_r.scalartypeWithDefault(2, self.scalar_type()))
+      .dtype(_r.scalartypeWithDefault(2, self.scalar_type()))
       //.device(_r.deviceWithDefault(4, self.device()))
       //.layout(_r.layoutWithDefault(3, layout_from_backend(self.options().backend())))
       .requires_grad(_r.toBool(6))

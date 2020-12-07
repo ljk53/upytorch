@@ -190,7 +190,7 @@ auto FunctionParameter::check(mp_obj_t obj, int argnum) -> bool
     // case ParameterType::GENERATOR: return THPGenerator_Check(obj);
     case ParameterType::BOOL: return isBool(obj);
     // case ParameterType::STORAGE: return isStorage(obj);
-    // case ParameterType::SCALARTYPE: return THPDtype_Check(obj) || THPPythonScalarType_Check(obj);
+    case ParameterType::SCALARTYPE: return isScalarType(obj);
     // case ParameterType::LAYOUT: return THPLayout_Check(obj);
     // case ParameterType::MEMORY_FORMAT: return THPMemoryFormat_Check(obj);
     // case ParameterType::QSCHEME: return THPQScheme_Check(obj);

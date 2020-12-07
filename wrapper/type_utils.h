@@ -4,6 +4,8 @@ extern "C" {
 #include "py/obj.h"
 }
 
+#include "upt_dtype.h"
+
 inline bool checkScalar(mp_obj_t obj) {
   return mp_obj_is_bool(obj) || mp_obj_is_int(obj) || mp_obj_is_float(obj);
 }
@@ -62,4 +64,29 @@ inline bool isTuple(mp_obj_t obj) {
 
 inline bool isList(mp_obj_t obj) {
   return mp_obj_is_type(obj, &mp_type_list);
+}
+
+inline bool isScalarType(mp_obj_t obj) {
+  return mp_obj_is_type(obj, &mp_type_type) || mp_obj_is_type(obj, &UPTDtypeClass);
+}
+
+inline at::ScalarType unpackScalarType(mp_obj_t obj) {
+  if (MP_OBJ_FROM_PTR(obj) == &mp_type_float) {
+    return at::ScalarType::Double;
+  }
+  if (MP_OBJ_FROM_PTR(obj) == &mp_type_bool) {
+    return at::ScalarType::Bool;
+  }
+  if (MP_OBJ_FROM_PTR(obj) == &mp_type_int) {
+    return at::ScalarType::Long;
+  }
+  if (mp_obj_is_type(obj, &UPTDtypeClass)) {
+    return *reinterpret_cast<at::ScalarType*>(((UPTDtype*)MP_OBJ_TO_PTR(obj))->scalar_type);
+  }
+  return at::ScalarType::Undefined;
+}
+
+// pytorch/torch/csrc/tensor/python_tensor.cpp
+inline at::ScalarType get_default_scalar_type() {
+  return at::typeMetaToScalarType(at::get_default_dtype());
 }
