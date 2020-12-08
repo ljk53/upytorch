@@ -5,6 +5,7 @@ extern "C" {
 }
 
 #include "upt_dtype.h"
+#include "upt_variable.h"
 
 inline bool checkScalar(mp_obj_t obj) {
   return mp_obj_is_bool(obj) || mp_obj_is_int(obj) || mp_obj_is_float(obj);
@@ -89,4 +90,14 @@ inline at::ScalarType unpackScalarType(mp_obj_t obj) {
 // pytorch/torch/csrc/tensor/python_tensor.cpp
 inline at::ScalarType get_default_scalar_type() {
   return at::typeMetaToScalarType(at::get_default_dtype());
+}
+
+// pytorch/torch/csrc/autograd/utils/wrap_outputs.h
+inline mp_obj_t wrap(at::Tensor tensor) {
+  return UPTVariable_Wrap(torch::autograd::Variable(std::move(tensor)));
+}
+
+// Meant to be different from `UPTVariable_Unpack`
+inline torch::autograd::Variable& unpackTensor(mp_obj_t obj) {
+  return ((UPTVariable*)MP_OBJ_TO_PTR(obj))->cdata;
 }

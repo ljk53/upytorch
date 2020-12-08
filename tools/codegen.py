@@ -19,8 +19,8 @@ from tools.codegen.model import NativeFunction, BaseOperatorName
 
 from tools.codegen.gen import cpp_string, with_native_function, FileManager
 from tools.autograd.gen_python_functions import (
-    is_noarg, is_py_torch_function, load_signatures,
-    group_overloads,
+    is_noarg, is_py_torch_function, is_py_variable_method,
+    load_signatures, group_overloads,
 )
 
 def gen(
@@ -33,6 +33,17 @@ def gen(
         install_dir=output_path,
         template_dir=os.path.join(codegen_root_path, 'templates'),
         dry_run=False)
+
+    methods = load_signatures(native_yaml_path, deprecated_yaml_path, method=True)
+    create_upy_bindings(
+        fm, methods,
+        lambda f: is_py_variable_method(f),
+        'torch', 'upt_variable_methods.cpp', method=True)
+    create_upy_bindings(
+        fm, methods,
+        lambda f: is_py_variable_method(f),
+        'torch', 'upt_variable_methods.h', method=True)
+
     functions = load_signatures(native_yaml_path, deprecated_yaml_path, method=False)
     create_upy_bindings(
         fm, functions,
@@ -71,8 +82,8 @@ def create_upy_bindings(
         'py_methods': py_methods,
     })
 
-def get_upt_name(name: BaseOperatorName) -> str:
-    return f'UPTVariable_{name}'
+def get_upt_name(name: BaseOperatorName, method: bool) -> str:
+    return f'UPTVariable_{"method_" if method else ""}{name}'
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 #
@@ -86,9 +97,6 @@ def forward_decls(
     *,
     method: bool
 ) -> Tuple[str, ...]:
-    if method:
-        return ()
-
     if is_noarg(overloads):
         return (f"""\
 ARGS_ONLY({name}, 0) \\
@@ -167,10 +175,14 @@ def method_impl(
     *,
     method: bool
 ) -> str:
-    uptname = get_upt_name(name)
+    uptname = get_upt_name(name, method)
     noarg = is_noarg(overloads)
 
-    method_header: List[str] = []
+    method_header: List[str] = [
+        "Tensor& self = unpackTensor(*args++);",
+        "--n_args;",
+    ] if method else []
+
     method_footer: List[str] = [
         'return mp_const_none;',
     ]
@@ -202,7 +214,7 @@ def method_impl(
         signatures=signatures,
         dispatch=dispatch,
         method_footer=method_footer,
-        self_="self_" if method else "nullptr",
+        self_="*args" if method else "nullptr",
     )
 
 # handler for output/no-output overload pair

@@ -3,6 +3,7 @@
 
 #include "upt_dtype.h"
 #include "generated/upt_torch_functions.h"
+#include "generated/upt_variable_methods.h"
 
 extern mp_obj_module_t module;
 
@@ -15,7 +16,25 @@ extern void UPTVariable_print(const mp_print_t* print, mp_obj_t self_, mp_print_
 
 MP_DEFINE_CONST_FUN_OBJ_1(UPTVariable_dealloc_obj, UPTVariable_dealloc);
 
+#define DECL_VARIABLE_METHODS(NAME, ARGS) \
+extern mp_obj_t UPTVariable_method_##NAME(size_t n_args, const mp_obj_t* args);
+#define DECL_VARIABLE_METHODS_KW(NAME, ARGS) \
+extern mp_obj_t UPTVariable_method_##NAME(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args);
+
+FOR_ALL_VARIABLE_METHODS(DECL_VARIABLE_METHODS, DECL_VARIABLE_METHODS_KW)
+
+#define DEFINE_OBJ_VARIABLE_METHODS(NAME, ARGS) \
+STATIC MP_DEFINE_CONST_FUN_OBJ_VAR(UPTVariable_method_##NAME##_obj, ARGS, UPTVariable_method_##NAME);
+#define DEFINE_OBJ_VARIABLE_METHODS_KW(NAME, ARGS) \
+STATIC MP_DEFINE_CONST_FUN_OBJ_KW(UPTVariable_method_##NAME##_obj, ARGS, UPTVariable_method_##NAME);
+
+FOR_ALL_VARIABLE_METHODS(DEFINE_OBJ_VARIABLE_METHODS, DEFINE_OBJ_VARIABLE_METHODS_KW)
+
+#define VARIABLE_METHODS_LOCALS(NAME, ARGS) \
+{ MP_ROM_QSTR(MP_QSTR_##NAME), MP_ROM_PTR(&UPTVariable_method_##NAME##_obj) },
+
 STATIC mp_rom_map_elem_t variable_locals_table[] = {
+  FOR_ALL_VARIABLE_METHODS(VARIABLE_METHODS_LOCALS, VARIABLE_METHODS_LOCALS)
   { MP_ROM_QSTR(MP_QSTR___del__), MP_ROM_PTR(&UPTVariable_dealloc_obj) },
 };
 MP_DEFINE_CONST_DICT(variable_locals, variable_locals_table);

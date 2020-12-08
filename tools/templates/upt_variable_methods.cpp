@@ -1,6 +1,6 @@
 // ${generated_comment}
 
-// See: pytorch/torch/csrc/autograd/generated/python_torch_functions.cpp
+// See: pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp
 
 #include <iostream>
 #include <torch/script.h>
