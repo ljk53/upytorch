@@ -102,7 +102,9 @@ def forward_decls(
 ARGS_ONLY({name}, 0) \\
 """,)
     else:
-        min_args = min(map(lambda o: len(o.signature.input_args), overloads))
+        min_args = min(map(
+            lambda o: sum(a.default is None for a in o.signature.input_args),
+            overloads))
         return (f"""\
 WITH_KWARGS({name}, {min_args}) \\
 """,)
