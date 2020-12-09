@@ -12,7 +12,8 @@
 
 #include "type_utils.h"
 
-namespace torch {
+namespace upt {
+using namespace torch;
 
 static std::unordered_map<std::string, ParameterType> type_map = {
   {"Tensor", ParameterType::TENSOR},
@@ -110,7 +111,7 @@ bool is_tensor(mp_obj_t obj) {
 //     mp_obj_t iobj = tuple ? PyTuple_GET_ITEM(obj, idx) : PyList_GET_ITEM(obj, idx);
 //     if (!is_tensor(iobj)) {
 //       if (throw_error) {
-//         TORCH_CHECK(false, "expected Tensor as element %d in argument %d, but got %s",
+//         throw TypeError("expected Tensor as element %d in argument %d, but got %s",
 //             static_cast<int>(idx), argnum, Py_TYPE(iobj)->tp_name);
 //       }
 //       return false;
@@ -317,7 +318,7 @@ static std::string parse_string_literal(c10::string_view str) {
         c = '\t';
         break;
       default:
-        TORCH_CHECK(false, "Unsupported escape sequence in string default: \\", str[i + 1]);
+        throw TypeError("Unsupported escape sequence in string default: \\", str[i + 1]);
     }
     parsed.push_back(c);
     i += 2;
@@ -489,10 +490,10 @@ static void extra_args(const FunctionSignature& signature, ssize_t nargs) {
   const long min_args = signature.min_args;
   const long nargs_ = nargs;
   if (min_args != max_pos_args) {
-    TORCH_CHECK(false, "%s() takes from %ld to %ld positional arguments but %ld were given",
+    throw TypeError("%s() takes from %ld to %ld positional arguments but %ld were given",
         signature.name.c_str(), min_args, max_pos_args, nargs_);
   }
-  TORCH_CHECK(false, "%s() takes %ld positional argument%s but %ld %s given",
+  throw TypeError("%s() takes %ld positional argument%s but %ld %s given",
       signature.name.c_str(),
       max_pos_args, max_pos_args == 1 ? "" : "s",
       nargs_, nargs == 1 ? "was" : "were");
@@ -514,7 +515,7 @@ static void missing_args(const FunctionSignature& signature, int idx) {
     }
   }
 
-  TORCH_CHECK(false, "%s() missing %d required positional argument%s: %s",
+  throw TypeError("%s() missing %d required positional argument%s: %s",
       signature.name.c_str(),
       num_missing,
       num_missing == 1 ? "s" : "",
@@ -542,23 +543,23 @@ static void extra_kwargs(FunctionSignature& signature, mp_map_t* kwargs, ssize_t
 
 //   while (PyDict_Next(kwargs, &pos, &key, &value)) {
 //     if (!THPUtils_checkString(key)) {
-//       TORCH_CHECK(false, "keywords must be strings");
+//       throw TypeError("keywords must be strings");
 //     }
 
 //     auto param_idx = find_param(signature, key);
 //     if (param_idx < 0) {
-//       TORCH_CHECK(false, "%s() got an unexpected keyword argument '%s'",
+//       throw TypeError("%s() got an unexpected keyword argument '%s'",
 //           signature.name.c_str(), THPUtils_unpackString(key).c_str());
 //     }
 
 //     if (param_idx < num_pos_args) {
-//       TORCH_CHECK(false, "%s() got multiple values for argument '%s'",
+//       throw TypeError("%s() got multiple values for argument '%s'",
 //           signature.name.c_str(), THPUtils_unpackString(key).c_str());
 //     }
 //   }
 
   // this should never be hit
-  TORCH_CHECK(false, "invalid keyword arguments");
+  throw TypeError("invalid keyword arguments");
 }
 
 bool FunctionSignature::parse(mp_obj_t self, size_t n_args, const mp_obj_t* args, mp_map_t* kwargs, mp_obj_t dst[],  // NOLINT
@@ -629,11 +630,11 @@ bool FunctionSignature::parse(mp_obj_t self, size_t n_args, const mp_obj_t* args
     } else if (raise_exception) {
       if (is_kwd) {
         // foo(): argument 'other' must be str
-        TORCH_CHECK(false, "%s(): argument '%s' must be %s",
+        throw TypeError("%s(): argument '%s' must be %s",
             name.c_str(), param.name.c_str(), param.type_name().c_str());
       } else {
         // foo(): argument 'other' (position 2) must be str
-        TORCH_CHECK(false, "%s(): argument '%s' (position %ld) must be %s",
+        throw TypeError("%s(): argument '%s' (position %ld) must be %s",
             name.c_str(), param.name.c_str(), static_cast<long>(arg_pos + 1),
             param.type_name().c_str());
       }
@@ -715,7 +716,7 @@ void PythonArgParser::print_error(mp_obj_t self, size_t n_args, const mp_obj_t* 
     signature.parse(self, n_args, args, kwargs, parsed_args, true);
   }
 
-  TORCH_CHECK(false, "Invalid arguments: %s()", function_name.c_str());
+  throw TypeError("Invalid arguments: %s()", function_name.c_str());
 }
 
 std::vector<std::string> PythonArgParser::get_signatures() const {
@@ -745,7 +746,7 @@ at::Tensor PythonArgs::tensor_slow(int i) {
   } else if (isFloat(obj)) {
     scalar = at::Scalar(unpackFloat(obj));
   } else {
-    TORCH_CHECK(false, "expected Tensor as argument %d", i);
+    throw TypeError("expected Tensor as argument %d", i);
   }
   at::Tensor tensor = scalar_to_tensor(scalar);
   tensor.unsafeGetTensorImpl()->set_wrapped_number(true);
@@ -770,4 +771,4 @@ at::Scalar PythonArgs::scalar_slow(int i) {
   return at::Scalar(unpackFloat(args[i]));
 }
 
-} // namespace torch
+}  // namespace upt

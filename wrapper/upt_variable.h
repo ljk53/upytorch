@@ -11,6 +11,8 @@ extern "C" {
 extern mp_obj_type_t UPTVariableClass;
 }  // extern "C"
 
+namespace upt {
+
 // THPVariable
 struct UPTVariable {
   mp_obj_base_t base;
@@ -40,3 +42,5 @@ inline torch::autograd::Variable& UPTVariable_Unpack(mp_obj_t obj) {
   auto var = (UPTVariable*)MP_OBJ_TO_PTR(obj);
   return var->cdata;
 }
+
+}  // namespace upt

@@ -12,6 +12,7 @@
 #include <ATen/ATen.h>
 #include <torch/csrc/autograd/variable.h>
 
+#include "exception.h"
 #include "upt_variable.h"
 #include "type_utils.h"
 
@@ -19,7 +20,8 @@ extern "C" {
 #include "py/obj.h"
 }
 
-namespace torch {
+namespace upt {
+using namespace torch;
 
 enum class ParameterType {
   TENSOR, SCALAR, INT64, DOUBLE, COMPLEX, TENSOR_LIST, INT_LIST, GENERATOR,
@@ -175,7 +177,7 @@ struct FunctionParameter {
 template<int N>
 inline PythonArgs PythonArgParser::parse(mp_obj_t self, size_t n_args, const mp_obj_t* args, mp_map_t* kwargs, ParsedArgs<N>& dst) {
   if (N < max_args) {
-    TORCH_CHECK(false, "PythonArgParser: dst ParsedArgs buffer does not have enough capacity, expected %d (got %d)",
+    throw TypeError("PythonArgParser: dst ParsedArgs buffer does not have enough capacity, expected %d (got %d)",
         (int)max_args, N);
   }
   return raw_parse(self, n_args, args, kwargs, dst.args);
@@ -248,7 +250,7 @@ inline c10::optional<at::Scalar> PythonArgs::scalarOptional(int i) {
 //   THPObjectPtr arg = six::maybeAsTuple(args[i]);
 //   auto size = tuple ? PyTuple_GET_SIZE(arg.get()) : PyList_GET_SIZE(arg.get());
 //   if (size != N) {
-//     TORCH_CHECK(false, "expected tuple of %d elements but got %d", N, (int)size);
+//     throw TypeError("expected tuple of %d elements but got %d", N, (int)size);
 //   }
 //   for (int idx = 0; idx < size; idx++) {
 //     mp_obj_t obj = tuple ? PyTuple_GET_ITEM(arg.get(), idx) : PyList_GET_ITEM(arg.get(), idx);
@@ -279,7 +281,7 @@ inline std::vector<int64_t> PythonArgs::intlistWithDefault(int i, std::vector<in
     try {
       res[idx] = unpackIndex(obj);
     } catch (const std::exception &e) {
-      TORCH_CHECK(false, "%s(): argument '%s' must be %s, but found element of wrong type at pos %d",
+      throw TypeError("%s(): argument '%s' must be %s, but found element of wrong type at pos %d",
           signature.name.c_str(), signature.params[i].name.c_str(),
           signature.params[i].type_name().c_str(), idx + 1);
     }
@@ -304,7 +306,7 @@ inline c10::OptionalArray<int64_t> PythonArgs::intlistOptional(int i) {
 //     try {
 //       res[idx] = THPUtils_unpackDouble(obj);
 //     } catch (const std::exception &e) {
-//       TORCH_CHECK(false, "%s(): argument '%s' must be %s, but found element of type %s at pos %d",
+//       throw TypeError("%s(): argument '%s' must be %s, but found element of type %s at pos %d",
 //           signature.name.c_str(), signature.params[i].name.c_str(),
 //           signature.params[i].type_name().c_str(), Py_TYPE(obj)->tp_name, idx + 1);
 //     }
@@ -536,9 +538,9 @@ inline bool PythonArgs::isNone(int i) {
 // inline c10::Stream PythonArgs::stream(int i) {
 //   if (isNull(args[i])) return c10::Stream(c10::Stream::Default::DEFAULT, c10::Device(DeviceType::CPU, -1));
 //   if (!THPStream_Check(args[i])) {
-//     TORCH_CHECK(false, "expected Stream object. Got '%s'", Py_TYPE(args[i])->tp_name);
+//     throw TypeError("expected Stream object. Got '%s'", Py_TYPE(args[i])->tp_name);
 //   }
 //   return c10::Stream::unpack(((THPStream*)args[i])->cdata);
 // }
 
-} // namespace torch
+}  // namespace upt

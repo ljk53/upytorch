@@ -7,6 +7,8 @@ extern "C" {
 #include "upt_dtype.h"
 #include "upt_variable.h"
 
+namespace upt {
+
 inline bool checkScalar(mp_obj_t obj) {
   return mp_obj_is_bool(obj) || mp_obj_is_int(obj) || mp_obj_is_float(obj);
 }
@@ -101,3 +103,5 @@ inline mp_obj_t wrap(at::Tensor tensor) {
 inline torch::autograd::Variable& unpackTensor(mp_obj_t obj) {
   return ((UPTVariable*)MP_OBJ_TO_PTR(obj))->cdata;
 }
+
+}  // namespace upt

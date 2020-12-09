@@ -179,13 +179,14 @@ def method_impl(
     noarg = is_noarg(overloads)
 
     method_header: List[str] = [
-        "Tensor& self = unpackTensor(*args++);",
-        "--n_args;",
+        'HANDLE_TH_ERRORS',
+    ]
+    method_header += [
+        'Tensor& self = unpackTensor(*args++);',
+        '--n_args;',
     ] if method else []
 
-    method_footer: List[str] = [
-        'return mp_const_none;',
-    ]
+    method_footer = ([] if noarg else ['return mp_const_none;']) + ['END_HANDLE_TH_ERRORS']
 
     grouped_overloads: Sequence[PythonSignatureGroup] = group_overloads(overloads)
     is_singleton = len(grouped_overloads) == 1
@@ -214,7 +215,7 @@ def method_impl(
         signatures=signatures,
         dispatch=dispatch,
         method_footer=method_footer,
-        self_="*args" if method else "nullptr",
+        self_='*args' if method else 'nullptr',
     )
 
 # handler for output/no-output overload pair

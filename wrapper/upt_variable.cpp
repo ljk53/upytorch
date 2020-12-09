@@ -5,6 +5,7 @@
 #include <sstream>
 #include <torch/script.h>
 
+namespace upt {
 using namespace at;
 using namespace torch;
 using namespace torch::autograd;
@@ -74,3 +75,5 @@ void UPTVariable_initModule(mp_obj_module_t* module) {
 }
 
 }  // extern "C"
+
+}  // namespace upt

@@ -5,18 +5,21 @@
 #include <iostream>
 #include <torch/script.h>
 
+#include "exception.h"
 #include "type_utils.h"
 #include "upt_arg_parser.h"
 #include "upt_variable.h"
 
 using namespace torch;
 using namespace torch::autograd;
+using namespace upt;
 
 extern "C" {
 
 \
 // add
 mp_obj_t UPTVariable_method_add(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args) {
+  HANDLE_TH_ERRORS
   Tensor& self = unpackTensor(*args++);
   --n_args;
   static PythonArgParser parser({
@@ -46,11 +49,13 @@ mp_obj_t UPTVariable_method_add(size_t n_args, const mp_obj_t* args, mp_map_t* k
     }
   }
   return mp_const_none;
+  END_HANDLE_TH_ERRORS
 }
 
 \
 // add_
 mp_obj_t UPTVariable_method_add_(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args) {
+  HANDLE_TH_ERRORS
   Tensor& self = unpackTensor(*args++);
   --n_args;
   static PythonArgParser parser({
@@ -80,11 +85,13 @@ mp_obj_t UPTVariable_method_add_(size_t n_args, const mp_obj_t* args, mp_map_t* 
     }
   }
   return mp_const_none;
+  END_HANDLE_TH_ERRORS
 }
 
 \
 // addmm
 mp_obj_t UPTVariable_method_addmm(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args) {
+  HANDLE_TH_ERRORS
   Tensor& self = unpackTensor(*args++);
   --n_args;
   static PythonArgParser parser({
@@ -124,11 +131,13 @@ mp_obj_t UPTVariable_method_addmm(size_t n_args, const mp_obj_t* args, mp_map_t*
     }
   }
   return mp_const_none;
+  END_HANDLE_TH_ERRORS
 }
 
 \
 // addmm_
 mp_obj_t UPTVariable_method_addmm_(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args) {
+  HANDLE_TH_ERRORS
   Tensor& self = unpackTensor(*args++);
   --n_args;
   static PythonArgParser parser({
@@ -168,10 +177,12 @@ mp_obj_t UPTVariable_method_addmm_(size_t n_args, const mp_obj_t* args, mp_map_t
     }
   }
   return mp_const_none;
+  END_HANDLE_TH_ERRORS
 }
 
 // mm
 mp_obj_t UPTVariable_method_mm(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args) {
+  HANDLE_TH_ERRORS
   Tensor& self = unpackTensor(*args++);
   --n_args;
   static PythonArgParser parser({
@@ -187,10 +198,12 @@ mp_obj_t UPTVariable_method_mm(size_t n_args, const mp_obj_t* args, mp_map_t* kw
   };
   return wrap(dispatch_mm(self, _r.tensor(0)));
   return mp_const_none;
+  END_HANDLE_TH_ERRORS
 }
 
 // mul
 mp_obj_t UPTVariable_method_mul(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args) {
+  HANDLE_TH_ERRORS
   Tensor& self = unpackTensor(*args++);
   --n_args;
   static PythonArgParser parser({
@@ -206,10 +219,12 @@ mp_obj_t UPTVariable_method_mul(size_t n_args, const mp_obj_t* args, mp_map_t* k
   };
   return wrap(dispatch_mul(self, _r.tensor(0)));
   return mp_const_none;
+  END_HANDLE_TH_ERRORS
 }
 
 // mul_
 mp_obj_t UPTVariable_method_mul_(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args) {
+  HANDLE_TH_ERRORS
   Tensor& self = unpackTensor(*args++);
   --n_args;
   static PythonArgParser parser({
@@ -225,10 +240,12 @@ mp_obj_t UPTVariable_method_mul_(size_t n_args, const mp_obj_t* args, mp_map_t* 
   };
   return wrap(dispatch_mul_(self, _r.tensor(0)));
   return mp_const_none;
+  END_HANDLE_TH_ERRORS
 }
 
 // softmax
 mp_obj_t UPTVariable_method_softmax(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args) {
+  HANDLE_TH_ERRORS
   Tensor& self = unpackTensor(*args++);
   --n_args;
   static PythonArgParser parser({
@@ -244,10 +261,12 @@ mp_obj_t UPTVariable_method_softmax(size_t n_args, const mp_obj_t* args, mp_map_
   };
   return wrap(dispatch_softmax(self, _r.toInt64(0), _r.scalartypeOptional(1)));
   return mp_const_none;
+  END_HANDLE_TH_ERRORS
 }
 
 // sum
 mp_obj_t UPTVariable_method_sum(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args) {
+  HANDLE_TH_ERRORS
   Tensor& self = unpackTensor(*args++);
   --n_args;
   static PythonArgParser parser({
@@ -263,6 +282,7 @@ mp_obj_t UPTVariable_method_sum(size_t n_args, const mp_obj_t* args, mp_map_t* k
   };
   return wrap(dispatch_sum(self, _r.scalartypeOptional(0)));
   return mp_const_none;
+  END_HANDLE_TH_ERRORS
 }
 
 }  // extern "C"

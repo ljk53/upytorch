@@ -5,19 +5,21 @@
 #include <iostream>
 #include <torch/script.h>
 
+#include "exception.h"
 #include "type_utils.h"
 #include "upt_arg_parser.h"
 #include "upt_variable.h"
 
 using namespace torch;
 using namespace torch::autograd;
+using namespace upt;
 
 extern "C" {
 
 \
 // add
 mp_obj_t UPTVariable_add(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args) {
-
+  HANDLE_TH_ERRORS
   static PythonArgParser parser({
     "add(Tensor input, Scalar alpha, Tensor other, *, Tensor out=None)|deprecated",
     "add(Tensor input, Tensor other, *, Scalar alpha=1, Tensor out=None)",
@@ -65,12 +67,13 @@ mp_obj_t UPTVariable_add(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args)
     }
   }
   return mp_const_none;
+  END_HANDLE_TH_ERRORS
 }
 
 \
 // addmm
 mp_obj_t UPTVariable_addmm(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args) {
-
+  HANDLE_TH_ERRORS
   static PythonArgParser parser({
     "addmm(Scalar beta, Tensor input, Scalar alpha, Tensor mat1, Tensor mat2, *, Tensor out=None)|deprecated",
     "addmm(Scalar beta, Tensor input, Tensor mat1, Tensor mat2, *, Tensor out=None)|deprecated",
@@ -138,11 +141,12 @@ mp_obj_t UPTVariable_addmm(size_t n_args, const mp_obj_t* args, mp_map_t* kw_arg
     }
   }
   return mp_const_none;
+  END_HANDLE_TH_ERRORS
 }
 
 // conv1d
 mp_obj_t UPTVariable_conv1d(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args) {
-
+  HANDLE_TH_ERRORS
   static PythonArgParser parser({
     "conv1d(Tensor input, Tensor weight, Tensor? bias=None, IntArrayRef[1] stride=1, IntArrayRef[1] padding=0, IntArrayRef[1] dilation=1, int64_t groups=1)",
   });
@@ -156,11 +160,12 @@ mp_obj_t UPTVariable_conv1d(size_t n_args, const mp_obj_t* args, mp_map_t* kw_ar
   };
   return wrap(dispatch_conv1d(_r.tensor(0), _r.tensor(1), _r.optionalTensor(2), _r.intlist(3), _r.intlist(4), _r.intlist(5), _r.toInt64(6)));
   return mp_const_none;
+  END_HANDLE_TH_ERRORS
 }
 
 // conv2d
 mp_obj_t UPTVariable_conv2d(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args) {
-
+  HANDLE_TH_ERRORS
   static PythonArgParser parser({
     "conv2d(Tensor input, Tensor weight, Tensor? bias=None, IntArrayRef[2] stride=1, IntArrayRef[2] padding=0, IntArrayRef[2] dilation=1, int64_t groups=1)",
   });
@@ -174,11 +179,12 @@ mp_obj_t UPTVariable_conv2d(size_t n_args, const mp_obj_t* args, mp_map_t* kw_ar
   };
   return wrap(dispatch_conv2d(_r.tensor(0), _r.tensor(1), _r.optionalTensor(2), _r.intlist(3), _r.intlist(4), _r.intlist(5), _r.toInt64(6)));
   return mp_const_none;
+  END_HANDLE_TH_ERRORS
 }
 
 // conv3d
 mp_obj_t UPTVariable_conv3d(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args) {
-
+  HANDLE_TH_ERRORS
   static PythonArgParser parser({
     "conv3d(Tensor input, Tensor weight, Tensor? bias=None, IntArrayRef[3] stride=1, IntArrayRef[3] padding=0, IntArrayRef[3] dilation=1, int64_t groups=1)",
   });
@@ -192,11 +198,12 @@ mp_obj_t UPTVariable_conv3d(size_t n_args, const mp_obj_t* args, mp_map_t* kw_ar
   };
   return wrap(dispatch_conv3d(_r.tensor(0), _r.tensor(1), _r.optionalTensor(2), _r.intlist(3), _r.intlist(4), _r.intlist(5), _r.toInt64(6)));
   return mp_const_none;
+  END_HANDLE_TH_ERRORS
 }
 
 // conv_transpose1d
 mp_obj_t UPTVariable_conv_transpose1d(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args) {
-
+  HANDLE_TH_ERRORS
   static PythonArgParser parser({
     "conv_transpose1d(Tensor input, Tensor weight, Tensor? bias=None, IntArrayRef[1] stride=1, IntArrayRef[1] padding=0, IntArrayRef[1] output_padding=0, int64_t groups=1, IntArrayRef[1] dilation=1)",
   });
@@ -210,11 +217,12 @@ mp_obj_t UPTVariable_conv_transpose1d(size_t n_args, const mp_obj_t* args, mp_ma
   };
   return wrap(dispatch_conv_transpose1d(_r.tensor(0), _r.tensor(1), _r.optionalTensor(2), _r.intlist(3), _r.intlist(4), _r.intlist(5), _r.toInt64(6), _r.intlist(7)));
   return mp_const_none;
+  END_HANDLE_TH_ERRORS
 }
 
 // conv_transpose2d
 mp_obj_t UPTVariable_conv_transpose2d(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args) {
-
+  HANDLE_TH_ERRORS
   static PythonArgParser parser({
     "conv_transpose2d(Tensor input, Tensor weight, Tensor? bias=None, IntArrayRef[2] stride=1, IntArrayRef[2] padding=0, IntArrayRef[2] output_padding=0, int64_t groups=1, IntArrayRef[2] dilation=1)",
   });
@@ -228,11 +236,12 @@ mp_obj_t UPTVariable_conv_transpose2d(size_t n_args, const mp_obj_t* args, mp_ma
   };
   return wrap(dispatch_conv_transpose2d(_r.tensor(0), _r.tensor(1), _r.optionalTensor(2), _r.intlist(3), _r.intlist(4), _r.intlist(5), _r.toInt64(6), _r.intlist(7)));
   return mp_const_none;
+  END_HANDLE_TH_ERRORS
 }
 
 // conv_transpose3d
 mp_obj_t UPTVariable_conv_transpose3d(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args) {
-
+  HANDLE_TH_ERRORS
   static PythonArgParser parser({
     "conv_transpose3d(Tensor input, Tensor weight, Tensor? bias=None, IntArrayRef[3] stride=1, IntArrayRef[3] padding=0, IntArrayRef[3] output_padding=0, int64_t groups=1, IntArrayRef[3] dilation=1)",
   });
@@ -246,11 +255,12 @@ mp_obj_t UPTVariable_conv_transpose3d(size_t n_args, const mp_obj_t* args, mp_ma
   };
   return wrap(dispatch_conv_transpose3d(_r.tensor(0), _r.tensor(1), _r.optionalTensor(2), _r.intlist(3), _r.intlist(4), _r.intlist(5), _r.toInt64(6), _r.intlist(7)));
   return mp_const_none;
+  END_HANDLE_TH_ERRORS
 }
 
 // convolution
 mp_obj_t UPTVariable_convolution(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args) {
-
+  HANDLE_TH_ERRORS
   static PythonArgParser parser({
     "convolution(Tensor input, Tensor weight, Tensor? bias, IntArrayRef stride, IntArrayRef padding, IntArrayRef dilation, bool transposed, IntArrayRef output_padding, int64_t groups)",
   });
@@ -264,11 +274,12 @@ mp_obj_t UPTVariable_convolution(size_t n_args, const mp_obj_t* args, mp_map_t* 
   };
   return wrap(dispatch_convolution(_r.tensor(0), _r.tensor(1), _r.optionalTensor(2), _r.intlist(3), _r.intlist(4), _r.intlist(5), _r.toBool(6), _r.intlist(7), _r.toInt64(8)));
   return mp_const_none;
+  END_HANDLE_TH_ERRORS
 }
 
 // empty
 mp_obj_t UPTVariable_empty(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args) {
-
+  HANDLE_TH_ERRORS
   static PythonArgParser parser({
     "empty(IntArrayRef size, *, MemoryFormat? memory_format=None, Tensor out=None, ScalarType dtype=None, Layout layout=torch.strided, Device device=None, bool pin_memory=False, bool requires_grad=False)",
   });
@@ -299,11 +310,12 @@ mp_obj_t UPTVariable_empty(size_t n_args, const mp_obj_t* args, mp_map_t* kw_arg
     return wrap(dispatch_empty_out(_r.tensor(2), _r.intlist(0), _r.memoryformatOptional(1)).set_requires_grad(_r.toBool(7)));
   }
   return mp_const_none;
+  END_HANDLE_TH_ERRORS
 }
 
 // empty_like
 mp_obj_t UPTVariable_empty_like(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args) {
-
+  HANDLE_TH_ERRORS
   static PythonArgParser parser({
     "empty_like(Tensor input, *, MemoryFormat? memory_format=None, ScalarType dtype=None, Layout layout=torch.strided, Device device=None, bool pin_memory=False, bool requires_grad=False)",
   });
@@ -325,12 +337,13 @@ mp_obj_t UPTVariable_empty_like(size_t n_args, const mp_obj_t* args, mp_map_t* k
   };
   return wrap(dispatch_empty_like(self, options, _r.memoryformatOptional(1)));
   return mp_const_none;
+  END_HANDLE_TH_ERRORS
 }
 
 \
 // eye
 mp_obj_t UPTVariable_eye(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args) {
-
+  HANDLE_TH_ERRORS
   static PythonArgParser parser({
     "eye(int64_t n, *, Tensor out=None, ScalarType dtype=None, Layout layout=torch.strided, Device device=None, bool pin_memory=False, bool requires_grad=False)",
     "eye(int64_t n, int64_t m, *, Tensor out=None, ScalarType dtype=None, Layout layout=torch.strided, Device device=None, bool pin_memory=False, bool requires_grad=False)",
@@ -392,11 +405,12 @@ mp_obj_t UPTVariable_eye(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args)
     }
   }
   return mp_const_none;
+  END_HANDLE_TH_ERRORS
 }
 
 // mm
 mp_obj_t UPTVariable_mm(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args) {
-
+  HANDLE_TH_ERRORS
   static PythonArgParser parser({
     "mm(Tensor input, Tensor mat2, *, Tensor out=None)",
   });
@@ -420,11 +434,12 @@ mp_obj_t UPTVariable_mm(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args) 
     return wrap(dispatch_mm_out(_r.tensor(2), _r.tensor(0), _r.tensor(1)));
   }
   return mp_const_none;
+  END_HANDLE_TH_ERRORS
 }
 
 // mul
 mp_obj_t UPTVariable_mul(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args) {
-
+  HANDLE_TH_ERRORS
   static PythonArgParser parser({
     "mul(Tensor input, Tensor other, *, Tensor out=None)",
   });
@@ -448,11 +463,12 @@ mp_obj_t UPTVariable_mul(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args)
     return wrap(dispatch_mul_out(_r.tensor(2), _r.tensor(0), _r.tensor(1)));
   }
   return mp_const_none;
+  END_HANDLE_TH_ERRORS
 }
 
 // ones
 mp_obj_t UPTVariable_ones(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args) {
-
+  HANDLE_TH_ERRORS
   static PythonArgParser parser({
     "ones(IntArrayRef size, *, Tensor out=None, ScalarType dtype=None, Layout layout=torch.strided, Device device=None, bool pin_memory=False, bool requires_grad=False)",
   });
@@ -483,11 +499,12 @@ mp_obj_t UPTVariable_ones(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args
     return wrap(dispatch_ones_out(_r.tensor(1), _r.intlist(0)).set_requires_grad(_r.toBool(6)));
   }
   return mp_const_none;
+  END_HANDLE_TH_ERRORS
 }
 
 // ones_like
 mp_obj_t UPTVariable_ones_like(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args) {
-
+  HANDLE_TH_ERRORS
   static PythonArgParser parser({
     "ones_like(Tensor input, *, MemoryFormat? memory_format=None, ScalarType dtype=None, Layout layout=torch.strided, Device device=None, bool pin_memory=False, bool requires_grad=False)",
   });
@@ -509,11 +526,12 @@ mp_obj_t UPTVariable_ones_like(size_t n_args, const mp_obj_t* args, mp_map_t* kw
   };
   return wrap(dispatch_ones_like(self, options, _r.memoryformatOptional(1)));
   return mp_const_none;
+  END_HANDLE_TH_ERRORS
 }
 
 // rand
 mp_obj_t UPTVariable_rand(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args) {
-
+  HANDLE_TH_ERRORS
   static PythonArgParser parser({
     "rand(IntArrayRef size, *, Tensor out=None, ScalarType dtype=None, Layout layout=torch.strided, Device device=None, bool pin_memory=False, bool requires_grad=False)",
   });
@@ -544,11 +562,12 @@ mp_obj_t UPTVariable_rand(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args
     return wrap(dispatch_rand_out(_r.tensor(1), _r.intlist(0)).set_requires_grad(_r.toBool(6)));
   }
   return mp_const_none;
+  END_HANDLE_TH_ERRORS
 }
 
 // softmax
 mp_obj_t UPTVariable_softmax(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args) {
-
+  HANDLE_TH_ERRORS
   static PythonArgParser parser({
     "softmax(Tensor input, int64_t dim, ScalarType? dtype=None)",
   });
@@ -562,11 +581,12 @@ mp_obj_t UPTVariable_softmax(size_t n_args, const mp_obj_t* args, mp_map_t* kw_a
   };
   return wrap(dispatch_softmax(_r.tensor(0), _r.toInt64(1), _r.scalartypeOptional(2)));
   return mp_const_none;
+  END_HANDLE_TH_ERRORS
 }
 
 // sum
 mp_obj_t UPTVariable_sum(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args) {
-
+  HANDLE_TH_ERRORS
   static PythonArgParser parser({
     "sum(Tensor input, *, ScalarType? dtype=None)",
   });
@@ -580,11 +600,12 @@ mp_obj_t UPTVariable_sum(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args)
   };
   return wrap(dispatch_sum(_r.tensor(0), _r.scalartypeOptional(1)));
   return mp_const_none;
+  END_HANDLE_TH_ERRORS
 }
 
 // zeros
 mp_obj_t UPTVariable_zeros(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args) {
-
+  HANDLE_TH_ERRORS
   static PythonArgParser parser({
     "zeros(IntArrayRef size, *, Tensor out=None, ScalarType dtype=None, Layout layout=torch.strided, Device device=None, bool pin_memory=False, bool requires_grad=False)",
   });
@@ -615,11 +636,12 @@ mp_obj_t UPTVariable_zeros(size_t n_args, const mp_obj_t* args, mp_map_t* kw_arg
     return wrap(dispatch_zeros_out(_r.tensor(1), _r.intlist(0)).set_requires_grad(_r.toBool(6)));
   }
   return mp_const_none;
+  END_HANDLE_TH_ERRORS
 }
 
 // zeros_like
 mp_obj_t UPTVariable_zeros_like(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args) {
-
+  HANDLE_TH_ERRORS
   static PythonArgParser parser({
     "zeros_like(Tensor input, *, MemoryFormat? memory_format=None, ScalarType dtype=None, Layout layout=torch.strided, Device device=None, bool pin_memory=False, bool requires_grad=False)",
   });
@@ -641,6 +663,7 @@ mp_obj_t UPTVariable_zeros_like(size_t n_args, const mp_obj_t* args, mp_map_t* k
   };
   return wrap(dispatch_zeros_like(self, options, _r.memoryformatOptional(1)));
   return mp_const_none;
+  END_HANDLE_TH_ERRORS
 }
 
 }  // extern "C"
