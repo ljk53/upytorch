@@ -38,10 +38,16 @@ Use Ctrl-D to exit, Ctrl-E for paste mode
 
 ## Binary Size
 
-* Uncompressed X86-64 runtime size (MicroPython runtime + PyTorch binding code, does not include ATen kernel size)
+* Uncompressed x86-64 runtime size (MicroPython runtime + PyTorch binding code, does not include ATen kernel size)
 ```bash
 $ du -sh build/upytorch
 384K    build/upytorch
+```
+
+* CPython 3.8.3 compiled with '-Os' flag and stripped (doesn't include PyTorch binding code)
+```bash
+$ du -sh python        
+2.6M    python
 ```
 
 * Run Bloaty to dump symbol size
