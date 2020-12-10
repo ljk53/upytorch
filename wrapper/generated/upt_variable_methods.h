@@ -3,6 +3,7 @@
 #pragma once
 
 #define FOR_ALL_VARIABLE_METHODS(ARGS_ONLY, WITH_KWARGS) \
+ARGS_ONLY(dim, 0) \
 WITH_KWARGS(add, 1) \
 WITH_KWARGS(add_, 1) \
 WITH_KWARGS(addmm, 2) \

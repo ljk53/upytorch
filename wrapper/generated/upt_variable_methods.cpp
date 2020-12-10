@@ -16,6 +16,14 @@ using namespace upt;
 
 extern "C" {
 
+// implemented on the python object to avoid dispatch overhead
+mp_obj_t UPTVariable_method_dim(size_t n_args, const mp_obj_t* args) {
+  HANDLE_TH_ERRORS
+  Tensor& self = unpackTensor(*args);
+  return packInt(self.dim());
+  END_HANDLE_TH_ERRORS
+}
+
 \
 // add
 mp_obj_t UPTVariable_method_add(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args) {

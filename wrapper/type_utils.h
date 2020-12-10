@@ -52,6 +52,11 @@ inline int64_t unpackInt(mp_obj_t obj) {
   return (int64_t) mp_obj_get_int(obj);
 }
 
+inline mp_obj_t packInt(int64_t value) {
+  // TODO: more rigerous typing
+  return mp_obj_new_int((mp_int_t)value);
+}
+
 inline bool isFloat(mp_obj_t obj) {
   return mp_obj_is_float(obj);
 }
