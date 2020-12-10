@@ -1,5 +1,7 @@
 import torch
 
+conv2d = torch.conv2d
+
 def linear(input, weight, bias=None):
     # type: (Tensor, Tensor, Optional[Tensor]) -> Tensor
     r"""
