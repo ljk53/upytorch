@@ -11,7 +11,7 @@ make
 printf '=%.0s' {1..180}
 echo
 echo "MicroPyTorch"
-taskset -c 0 build/upytorch benchmark/simple_add.py
+MICROPYPATH=. taskset -c 0 build/upytorch benchmark/simple_add.py
 echo
 
 printf '=%.0s' {1..180}

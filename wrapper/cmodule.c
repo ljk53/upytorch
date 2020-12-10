@@ -5,7 +5,7 @@
 #include "generated/upt_torch_functions.h"
 #include "generated/upt_variable_methods.h"
 
-extern mp_obj_module_t module;
+extern mp_obj_module_t mp_module_torch_C;
 
 ///////////////////////////////////////////////////////////////////////////////
 // torch.Tensor - THPVariableClass
@@ -89,8 +89,8 @@ FOR_ALL_TORCH_FUNCTIONS(DEFINE_OBJ_TORCH_FNS, DEFINE_OBJ_TORCH_FNS_KW)
 // torch module
 
 STATIC mp_obj_t init_module() {
-  UPTVariable_initModule(&module);
-  UPTDtype_initModule(&module);
+  UPTVariable_initModule(&mp_module_torch_C);
+  UPTDtype_initModule(&mp_module_torch_C);
   return mp_const_none;
 }
 STATIC MP_DEFINE_CONST_FUN_OBJ_0(init_module_obj, init_module);
@@ -110,9 +110,9 @@ STATIC mp_rom_map_elem_t module_globals_table[] = {
 
 MP_DEFINE_CONST_DICT(module_globals, module_globals_table);
 
-mp_obj_module_t module = {
+mp_obj_module_t mp_module_torch_C = {
   .base = { &mp_type_module },
   .globals = (mp_obj_dict_t*)&module_globals,
 };
 
-MP_REGISTER_MODULE(MP_QSTR_torch, module, MODULE_TORCH_ENABLED);
+MP_REGISTER_MODULE(MP_QSTR_torch_C, mp_module_torch_C, MODULE_TORCH_ENABLED);

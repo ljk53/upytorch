@@ -89,6 +89,7 @@ $(PROG): wrapper/libwrapper.a
 	$(MAKEUPY) $(UPYFLAGSS) all
 
 test: $(PROG)
+	MICROPYPATH=$(CURDIR) \
 	MICROPY_MICROPYTHON=$(PROG) \
 	python3 $(UPY_DIR)/tests/run-tests --keep-path -d $(CURDIR)/tests
 
