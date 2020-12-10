@@ -144,25 +144,6 @@ mp_obj_t UPTVariable_addmm(size_t n_args, const mp_obj_t* args, mp_map_t* kw_arg
   END_HANDLE_TH_ERRORS
 }
 
-// conv1d
-mp_obj_t UPTVariable_conv1d(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args) {
-  HANDLE_TH_ERRORS
-  static PythonArgParser parser({
-    "conv1d(Tensor input, Tensor weight, Tensor? bias=None, IntArrayRef[1] stride=1, IntArrayRef[1] padding=0, IntArrayRef[1] dilation=1, int64_t groups=1)",
-  });
-  ParsedArgs<7> parsed_args;
-  auto _r = parser.parse(nullptr, n_args, args, kw_args, parsed_args);
-  // aten::conv1d(Tensor input, Tensor weight, Tensor? bias=None, int[1] stride=1, int[1] padding=0, int[1] dilation=1, int groups=1) -> Tensor
-  
-  auto dispatch_conv1d = [](const Tensor & input, const Tensor & weight, const c10::optional<Tensor>& bias, IntArrayRef stride, IntArrayRef padding, IntArrayRef dilation, int64_t groups) -> Tensor {
-    // pybind11::gil_scoped_release no_gil;
-    return at::conv1d(input, weight, bias, stride, padding, dilation, groups);
-  };
-  return wrap(dispatch_conv1d(_r.tensor(0), _r.tensor(1), _r.optionalTensor(2), _r.intlist(3), _r.intlist(4), _r.intlist(5), _r.toInt64(6)));
-  return mp_const_none;
-  END_HANDLE_TH_ERRORS
-}
-
 // conv2d
 mp_obj_t UPTVariable_conv2d(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args) {
   HANDLE_TH_ERRORS
@@ -182,44 +163,6 @@ mp_obj_t UPTVariable_conv2d(size_t n_args, const mp_obj_t* args, mp_map_t* kw_ar
   END_HANDLE_TH_ERRORS
 }
 
-// conv3d
-mp_obj_t UPTVariable_conv3d(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args) {
-  HANDLE_TH_ERRORS
-  static PythonArgParser parser({
-    "conv3d(Tensor input, Tensor weight, Tensor? bias=None, IntArrayRef[3] stride=1, IntArrayRef[3] padding=0, IntArrayRef[3] dilation=1, int64_t groups=1)",
-  });
-  ParsedArgs<7> parsed_args;
-  auto _r = parser.parse(nullptr, n_args, args, kw_args, parsed_args);
-  // aten::conv3d(Tensor input, Tensor weight, Tensor? bias=None, int[3] stride=1, int[3] padding=0, int[3] dilation=1, int groups=1) -> Tensor
-  
-  auto dispatch_conv3d = [](const Tensor & input, const Tensor & weight, const c10::optional<Tensor>& bias, IntArrayRef stride, IntArrayRef padding, IntArrayRef dilation, int64_t groups) -> Tensor {
-    // pybind11::gil_scoped_release no_gil;
-    return at::conv3d(input, weight, bias, stride, padding, dilation, groups);
-  };
-  return wrap(dispatch_conv3d(_r.tensor(0), _r.tensor(1), _r.optionalTensor(2), _r.intlist(3), _r.intlist(4), _r.intlist(5), _r.toInt64(6)));
-  return mp_const_none;
-  END_HANDLE_TH_ERRORS
-}
-
-// conv_transpose1d
-mp_obj_t UPTVariable_conv_transpose1d(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args) {
-  HANDLE_TH_ERRORS
-  static PythonArgParser parser({
-    "conv_transpose1d(Tensor input, Tensor weight, Tensor? bias=None, IntArrayRef[1] stride=1, IntArrayRef[1] padding=0, IntArrayRef[1] output_padding=0, int64_t groups=1, IntArrayRef[1] dilation=1)",
-  });
-  ParsedArgs<8> parsed_args;
-  auto _r = parser.parse(nullptr, n_args, args, kw_args, parsed_args);
-  // aten::conv_transpose1d(Tensor input, Tensor weight, Tensor? bias=None, int[1] stride=1, int[1] padding=0, int[1] output_padding=0, int groups=1, int[1] dilation=1) -> Tensor
-  
-  auto dispatch_conv_transpose1d = [](const Tensor & input, const Tensor & weight, const c10::optional<Tensor>& bias, IntArrayRef stride, IntArrayRef padding, IntArrayRef output_padding, int64_t groups, IntArrayRef dilation) -> Tensor {
-    // pybind11::gil_scoped_release no_gil;
-    return at::conv_transpose1d(input, weight, bias, stride, padding, output_padding, groups, dilation);
-  };
-  return wrap(dispatch_conv_transpose1d(_r.tensor(0), _r.tensor(1), _r.optionalTensor(2), _r.intlist(3), _r.intlist(4), _r.intlist(5), _r.toInt64(6), _r.intlist(7)));
-  return mp_const_none;
-  END_HANDLE_TH_ERRORS
-}
-
 // conv_transpose2d
 mp_obj_t UPTVariable_conv_transpose2d(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args) {
   HANDLE_TH_ERRORS
@@ -235,25 +178,6 @@ mp_obj_t UPTVariable_conv_transpose2d(size_t n_args, const mp_obj_t* args, mp_ma
     return at::conv_transpose2d(input, weight, bias, stride, padding, output_padding, groups, dilation);
   };
   return wrap(dispatch_conv_transpose2d(_r.tensor(0), _r.tensor(1), _r.optionalTensor(2), _r.intlist(3), _r.intlist(4), _r.intlist(5), _r.toInt64(6), _r.intlist(7)));
-  return mp_const_none;
-  END_HANDLE_TH_ERRORS
-}
-
-// conv_transpose3d
-mp_obj_t UPTVariable_conv_transpose3d(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args) {
-  HANDLE_TH_ERRORS
-  static PythonArgParser parser({
-    "conv_transpose3d(Tensor input, Tensor weight, Tensor? bias=None, IntArrayRef[3] stride=1, IntArrayRef[3] padding=0, IntArrayRef[3] output_padding=0, int64_t groups=1, IntArrayRef[3] dilation=1)",
-  });
-  ParsedArgs<8> parsed_args;
-  auto _r = parser.parse(nullptr, n_args, args, kw_args, parsed_args);
-  // aten::conv_transpose3d.input(Tensor input, Tensor weight, Tensor? bias=None, int[3] stride=1, int[3] padding=0, int[3] output_padding=0, int groups=1, int[3] dilation=1) -> Tensor
-  
-  auto dispatch_conv_transpose3d = [](const Tensor & input, const Tensor & weight, const c10::optional<Tensor>& bias, IntArrayRef stride, IntArrayRef padding, IntArrayRef output_padding, int64_t groups, IntArrayRef dilation) -> Tensor {
-    // pybind11::gil_scoped_release no_gil;
-    return at::conv_transpose3d(input, weight, bias, stride, padding, output_padding, groups, dilation);
-  };
-  return wrap(dispatch_conv_transpose3d(_r.tensor(0), _r.tensor(1), _r.optionalTensor(2), _r.intlist(3), _r.intlist(4), _r.intlist(5), _r.toInt64(6), _r.intlist(7)));
   return mp_const_none;
   END_HANDLE_TH_ERRORS
 }
@@ -404,6 +328,25 @@ mp_obj_t UPTVariable_eye(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args)
       }
     }
   }
+  return mp_const_none;
+  END_HANDLE_TH_ERRORS
+}
+
+// matmul
+mp_obj_t UPTVariable_matmul(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args) {
+  HANDLE_TH_ERRORS
+  static PythonArgParser parser({
+    "matmul(Tensor input, Tensor other)",
+  });
+  ParsedArgs<2> parsed_args;
+  auto _r = parser.parse(nullptr, n_args, args, kw_args, parsed_args);
+  // aten::matmul(Tensor self, Tensor other) -> Tensor
+  
+  auto dispatch_matmul = [](const Tensor & self, const Tensor & other) -> Tensor {
+    // pybind11::gil_scoped_release no_gil;
+    return self.matmul(other);
+  };
+  return wrap(dispatch_matmul(_r.tensor(0), _r.tensor(1)));
   return mp_const_none;
   END_HANDLE_TH_ERRORS
 }
@@ -599,6 +542,25 @@ mp_obj_t UPTVariable_sum(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args)
     return self.sum(dtype);
   };
   return wrap(dispatch_sum(_r.tensor(0), _r.scalartypeOptional(1)));
+  return mp_const_none;
+  END_HANDLE_TH_ERRORS
+}
+
+// t
+mp_obj_t UPTVariable_t(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args) {
+  HANDLE_TH_ERRORS
+  static PythonArgParser parser({
+    "t(Tensor input)",
+  });
+  ParsedArgs<1> parsed_args;
+  auto _r = parser.parse(nullptr, n_args, args, kw_args, parsed_args);
+  // aten::t(Tensor(a) self) -> Tensor(a)
+  
+  auto dispatch_t = [](const Tensor & self) -> Tensor {
+    // pybind11::gil_scoped_release no_gil;
+    return self.t();
+  };
+  return wrap(dispatch_t(_r.tensor(0)));
   return mp_const_none;
   END_HANDLE_TH_ERRORS
 }

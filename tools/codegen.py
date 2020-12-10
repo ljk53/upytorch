@@ -162,7 +162,6 @@ mp_obj_t ${uptname}(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args) {
 PY_VARIABLE_METHOD_NOARGS = CodeTemplate("""\
 // ${name}
 mp_obj_t ${uptname}(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args) {
-{
   ${method_header}
   ${dispatch}
   ${method_footer}

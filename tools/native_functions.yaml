@@ -53,23 +53,10 @@
 - func: convolution(Tensor input, Tensor weight, Tensor? bias, int[] stride, int[] padding, int[] dilation, bool transposed, int[] output_padding, int groups) -> Tensor
   use_c10_dispatcher: hacky_wrapper_for_legacy_signatures
 
-- func: conv1d(Tensor input, Tensor weight, Tensor? bias=None, int[1] stride=1, int[1] padding=0, int[1] dilation=1, int groups=1) -> Tensor
-  use_c10_dispatcher: hacky_wrapper_for_legacy_signatures
-
 - func: conv2d(Tensor input, Tensor weight, Tensor? bias=None, int[2] stride=1, int[2] padding=0, int[2] dilation=1, int groups=1) -> Tensor
   use_c10_dispatcher: hacky_wrapper_for_legacy_signatures
 
-- func: conv3d(Tensor input, Tensor weight, Tensor? bias=None, int[3] stride=1, int[3] padding=0, int[3] dilation=1, int groups=1) -> Tensor
-  use_c10_dispatcher: hacky_wrapper_for_legacy_signatures
-
-# NB: we inherit the goofy argument order from PyTorch torch.nn.functional
-- func: conv_transpose1d(Tensor input, Tensor weight, Tensor? bias=None, int[1] stride=1, int[1] padding=0, int[1] output_padding=0, int groups=1, int[1] dilation=1) -> Tensor
-  use_c10_dispatcher: hacky_wrapper_for_legacy_signatures
-
 - func: conv_transpose2d.input(Tensor input, Tensor weight, Tensor? bias=None, int[2] stride=1, int[2] padding=0, int[2] output_padding=0, int groups=1, int[2] dilation=1) -> Tensor
-  use_c10_dispatcher: hacky_wrapper_for_legacy_signatures
-
-- func: conv_transpose3d.input(Tensor input, Tensor weight, Tensor? bias=None, int[3] stride=1, int[3] padding=0, int[3] output_padding=0, int groups=1, int[3] dilation=1) -> Tensor
   use_c10_dispatcher: hacky_wrapper_for_legacy_signatures
 
 - func: empty.memory_format(int[] size, *, ScalarType? dtype=None, Layout? layout=None, Device? device=None, bool? pin_memory=None, MemoryFormat? memory_format=None) -> Tensor
@@ -102,6 +89,10 @@
   dispatch:
     CPU: eye_out_cpu
     CUDA: eye_out_cuda
+
+- func: matmul(Tensor self, Tensor other) -> Tensor
+  use_c10_dispatcher: full
+  variants: function, method
 
 - func: mm(Tensor self, Tensor mat2) -> Tensor
   use_c10_dispatcher: full
@@ -175,6 +166,20 @@
   variants: function, method
   dispatch:
     CPU, CUDA: sum
+
+- func: t(Tensor(a) self) -> Tensor(a)
+  use_c10_dispatcher: full
+  device_guard: False
+  variants: function, method
+  dispatch:
+    DefaultBackend: t
+
+- func: t_(Tensor(a!) self) -> Tensor(a!)
+  use_c10_dispatcher: full
+  device_guard: False
+  variants: method
+  dispatch:
+    DefaultBackend: t_
 
 - func: zeros(int[] size, *, ScalarType? dtype=None, Layout? layout=None, Device? device=None, bool? pin_memory=None) -> Tensor
   use_c10_dispatcher: hacky_wrapper_for_legacy_signatures

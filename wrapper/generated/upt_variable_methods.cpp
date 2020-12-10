@@ -188,6 +188,27 @@ mp_obj_t UPTVariable_method_addmm_(size_t n_args, const mp_obj_t* args, mp_map_t
   END_HANDLE_TH_ERRORS
 }
 
+// matmul
+mp_obj_t UPTVariable_method_matmul(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args) {
+  HANDLE_TH_ERRORS
+  Tensor& self = unpackTensor(*args++);
+  --n_args;
+  static PythonArgParser parser({
+    "matmul(Tensor other)",
+  });
+  ParsedArgs<1> parsed_args;
+  auto _r = parser.parse(*args, n_args, args, kw_args, parsed_args);
+  // aten::matmul(Tensor self, Tensor other) -> Tensor
+  
+  auto dispatch_matmul = [](Tensor & self, const Tensor & other) -> Tensor {
+    // pybind11::gil_scoped_release no_gil;
+    return self.matmul(other);
+  };
+  return wrap(dispatch_matmul(self, _r.tensor(0)));
+  return mp_const_none;
+  END_HANDLE_TH_ERRORS
+}
+
 // mm
 mp_obj_t UPTVariable_method_mm(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args) {
   HANDLE_TH_ERRORS
@@ -290,6 +311,36 @@ mp_obj_t UPTVariable_method_sum(size_t n_args, const mp_obj_t* args, mp_map_t* k
   };
   return wrap(dispatch_sum(self, _r.scalartypeOptional(0)));
   return mp_const_none;
+  END_HANDLE_TH_ERRORS
+}
+
+// t
+mp_obj_t UPTVariable_method_t(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args) {
+  HANDLE_TH_ERRORS
+  Tensor& self = unpackTensor(*args++);
+  --n_args;
+  // aten::t(Tensor(a) self) -> Tensor(a)
+  
+  auto dispatch_t = [](Tensor & self) -> Tensor {
+    // pybind11::gil_scoped_release no_gil;
+    return self.t();
+  };
+  return wrap(dispatch_t(self));
+  END_HANDLE_TH_ERRORS
+}
+
+// t_
+mp_obj_t UPTVariable_method_t_(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args) {
+  HANDLE_TH_ERRORS
+  Tensor& self = unpackTensor(*args++);
+  --n_args;
+  // aten::t_(Tensor(a!) self) -> Tensor(a!)
+  
+  auto dispatch_t_ = [](Tensor & self) -> Tensor {
+    // pybind11::gil_scoped_release no_gil;
+    return self.t_();
+  };
+  return wrap(dispatch_t_(self));
   END_HANDLE_TH_ERRORS
 }
 
