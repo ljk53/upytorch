@@ -201,6 +201,44 @@ mp_obj_t UPTVariable_convolution(size_t n_args, const mp_obj_t* args, mp_map_t* 
   END_HANDLE_TH_ERRORS
 }
 
+// dropout
+mp_obj_t UPTVariable_dropout(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args) {
+  HANDLE_TH_ERRORS
+  static PythonArgParser parser({
+    "dropout(Tensor input, double p, bool train)",
+  });
+  ParsedArgs<3> parsed_args;
+  auto _r = parser.parse(nullptr, n_args, args, kw_args, parsed_args);
+  // aten::dropout(Tensor input, float p, bool train) -> Tensor
+  
+  auto dispatch_dropout = [](const Tensor & input, double p, bool train) -> Tensor {
+    // pybind11::gil_scoped_release no_gil;
+    return at::dropout(input, p, train);
+  };
+  return wrap(dispatch_dropout(_r.tensor(0), _r.toDouble(1), _r.toBool(2)));
+  return mp_const_none;
+  END_HANDLE_TH_ERRORS
+}
+
+// dropout_
+mp_obj_t UPTVariable_dropout_(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args) {
+  HANDLE_TH_ERRORS
+  static PythonArgParser parser({
+    "dropout_(Tensor input, double p, bool train)",
+  });
+  ParsedArgs<3> parsed_args;
+  auto _r = parser.parse(nullptr, n_args, args, kw_args, parsed_args);
+  // aten::dropout_(Tensor(a!) self, float p, bool train) -> Tensor(a!)
+  
+  auto dispatch_dropout_ = [](Tensor self, double p, bool train) -> Tensor {
+    // pybind11::gil_scoped_release no_gil;
+    return at::dropout_(self, p, train);
+  };
+  return wrap(dispatch_dropout_(_r.tensor(0), _r.toDouble(1), _r.toBool(2)));
+  return mp_const_none;
+  END_HANDLE_TH_ERRORS
+}
+
 // empty
 mp_obj_t UPTVariable_empty(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args) {
   HANDLE_TH_ERRORS

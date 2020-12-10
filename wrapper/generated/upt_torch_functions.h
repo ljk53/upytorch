@@ -8,6 +8,8 @@ WITH_KWARGS(addmm, 3) \
 WITH_KWARGS(conv2d, 2) \
 WITH_KWARGS(conv_transpose2d, 2) \
 WITH_KWARGS(convolution, 9) \
+WITH_KWARGS(dropout, 3) \
+WITH_KWARGS(dropout_, 3) \
 WITH_KWARGS(empty, 1) \
 WITH_KWARGS(empty_like, 1) \
 WITH_KWARGS(eye, 1) \
