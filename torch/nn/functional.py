@@ -100,5 +100,5 @@ def adaptive_avg_pool2d(input, output_size):
         output_size: the target output size (single integer or
             double-integer tuple)
     """
-    _output_size = _list_with_default(output_size, [0, 0, 0]) # HACK: input.size()
+    _output_size = _list_with_default(output_size, input.size())
     return torch.adaptive_avg_pool2d(input, _output_size)

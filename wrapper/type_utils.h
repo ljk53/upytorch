@@ -70,6 +70,21 @@ inline bool isTuple(mp_obj_t obj) {
   return mp_obj_is_type(obj, &mp_type_tuple);
 }
 
+inline mp_obj_t packIntTuple(size_t n, const int64_t* data) {
+  if (n == 0) {
+    return mp_const_empty_tuple;
+  }
+  mp_obj_tuple_t *o = m_new_obj_var(mp_obj_tuple_t, mp_obj_t, n);
+  o->base.type = &mp_type_tuple;
+  o->len = n;
+  if (data) {
+      for (size_t i = 0; i < n; i++) {
+          o->items[i] = packInt(data[i]);
+      }
+  }
+  return MP_OBJ_FROM_PTR(o);
+}
+
 inline bool isList(mp_obj_t obj) {
   return mp_obj_is_type(obj, &mp_type_list);
 }
