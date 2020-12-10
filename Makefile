@@ -93,7 +93,13 @@ test: $(PROG)
 	MICROPY_MICROPYTHON=$(PROG) \
 	python3 $(UPY_DIR)/tests/run-tests --keep-path -d $(CURDIR)/tests
 
+# Build standard micropython binary to run 'upip'.
+upy:
+	make -C $(UPY_DIR)/mpy-cross
+	make -C $(UPY_PORT_DIR) BUILD=$(BUILD_ROOT) PROG=$(CURDIR)/upy
+
 clean:
 	$(MAKEUPY) clean
 	rm -rf build
 	rm -f wrapper/*.o wrapper/*.a wrapper/*.so wrapper/generated/*.o
+	rm -f upy upy.map
