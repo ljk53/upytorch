@@ -1,6 +1,7 @@
 from collections import OrderedDict, namedtuple
 import torch
 from torch import Tensor, dtype
+from torch import itertools
 
 
 class _IncompatibleKeys(namedtuple('IncompatibleKeys', ['missing_keys', 'unexpected_keys'])):
@@ -328,9 +329,9 @@ class Module:
         if not isinstance(module, Module) and module is not None:
             raise TypeError("{} is not a Module subclass".format(
                 torch.typename(module)))
-        elif not isinstance(name, torch._six.string_classes):
-            raise TypeError("module name should be a string. Got {}".format(
-                torch.typename(name)))
+        # elif not isinstance(name, torch._six.string_classes):
+        #     raise TypeError("module name should be a string. Got {}".format(
+        #         torch.typename(name)))
         elif hasattr(self, name) and name not in self._modules:
             raise KeyError("attribute '{}' already exists".format(name))
         elif '.' in name:
@@ -720,10 +721,7 @@ class Module:
                 if not isinstance(result, tuple):
                     result = (result,)
                 input = result
-        if torch._C._get_tracing_state():
-            result = self._slow_forward(*input, **kwargs)
-        else:
-            result = self.forward(*input, **kwargs)
+        result = self.forward(*input, **kwargs)
         for hook in itertools.chain(
                 _global_forward_hooks.values(),
                 self._forward_hooks.values()):

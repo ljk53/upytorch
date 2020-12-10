@@ -17,3 +17,9 @@ print(linear(a, w, bias=b))
 L = nn.Linear(256 * 6 * 6, 4096)
 print(L.weight.dim())
 L.forward(torch.ones(1, 256 * 6 * 6))
+
+N = nn.Sequential(
+    nn.Linear(256 * 6 * 6, 4096),
+    nn.Linear(4096, 32),
+)
+N.forward(torch.ones(1, 256 * 6 * 6))
