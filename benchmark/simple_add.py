@@ -5,12 +5,12 @@ import gc
 
 
 def report_header():
-    print("{:>55}{:>25}{:>25}{:>25}".format(
+    print("{:>45}{:>15}{:>15}{:>15}".format(
         "name", "ns (avg)", "ns (min)", "stdev"))
 
 
 def report(name, duration_avg, duration_min, stdev):
-    print("{:>55}{:>25.2f}{:>25.2f}{:>25.2f}".format(
+    print("{:>45}{:>15.2f}{:>15.2f}{:>15.2f}".format(
         name, duration_avg * 1e9, duration_min * 1e9, stdev * 1e9))
 
 
