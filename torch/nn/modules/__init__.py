@@ -1,8 +1,9 @@
 from .module import Module
-from .linear import Linear
+from .activation import ReLU
 from .container import Sequential
 from .conv import Conv2d
+from .linear import Linear
 
 __all__ = [
-    'Module', 'Linear', 'Sequential', 'Conv2d',
+    'Module', 'Linear', 'Sequential', 'Conv2d', 'ReLU',
 ]

@@ -12,6 +12,8 @@ WITH_KWARGS(matmul, 1) \
 WITH_KWARGS(mm, 1) \
 WITH_KWARGS(mul, 1) \
 WITH_KWARGS(mul_, 1) \
+ARGS_ONLY(relu, 0) \
+ARGS_ONLY(relu_, 0) \
 WITH_KWARGS(softmax, 1) \
 WITH_KWARGS(sum, 0) \
 ARGS_ONLY(t, 0) \

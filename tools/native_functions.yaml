@@ -157,6 +157,22 @@
 
 - func: rand.out(int[] size, *, Tensor(a!) out) -> Tensor(a!)
 
+- func: relu(Tensor self) -> Tensor
+  use_c10_dispatcher: full
+  variants: function, method
+  dispatch:
+    CPU, CUDA: relu
+    MkldnnCPU: mkldnn_relu
+    QuantizedCPU: relu_quantized_cpu
+
+- func: relu_(Tensor(a!) self) -> Tensor(a!)
+  use_c10_dispatcher: full
+  variants: function, method
+  dispatch:
+    CPU, CUDA: relu_
+    MkldnnCPU: mkldnn_relu_
+    QuantizedCPU: relu_quantized_cpu_
+
 - func: softmax.int(Tensor self, int dim, ScalarType? dtype=None) -> Tensor
   use_c10_dispatcher: full
   variants: function, method

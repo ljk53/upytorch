@@ -17,6 +17,8 @@ WITH_KWARGS(mul, 2) \
 WITH_KWARGS(ones, 1) \
 WITH_KWARGS(ones_like, 1) \
 WITH_KWARGS(rand, 1) \
+WITH_KWARGS(relu, 1) \
+WITH_KWARGS(relu_, 1) \
 WITH_KWARGS(softmax, 2) \
 WITH_KWARGS(sum, 1) \
 WITH_KWARGS(t, 1) \

@@ -508,6 +508,44 @@ mp_obj_t UPTVariable_rand(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args
   END_HANDLE_TH_ERRORS
 }
 
+// relu
+mp_obj_t UPTVariable_relu(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args) {
+  HANDLE_TH_ERRORS
+  static PythonArgParser parser({
+    "relu(Tensor input)",
+  });
+  ParsedArgs<1> parsed_args;
+  auto _r = parser.parse(nullptr, n_args, args, kw_args, parsed_args);
+  // aten::relu(Tensor self) -> Tensor
+  
+  auto dispatch_relu = [](const Tensor & self) -> Tensor {
+    // pybind11::gil_scoped_release no_gil;
+    return self.relu();
+  };
+  return wrap(dispatch_relu(_r.tensor(0)));
+  return mp_const_none;
+  END_HANDLE_TH_ERRORS
+}
+
+// relu_
+mp_obj_t UPTVariable_relu_(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args) {
+  HANDLE_TH_ERRORS
+  static PythonArgParser parser({
+    "relu_(Tensor input)",
+  });
+  ParsedArgs<1> parsed_args;
+  auto _r = parser.parse(nullptr, n_args, args, kw_args, parsed_args);
+  // aten::relu_(Tensor(a!) self) -> Tensor(a!)
+  
+  auto dispatch_relu_ = [](Tensor self) -> Tensor {
+    // pybind11::gil_scoped_release no_gil;
+    return self.relu_();
+  };
+  return wrap(dispatch_relu_(_r.tensor(0)));
+  return mp_const_none;
+  END_HANDLE_TH_ERRORS
+}
+
 // softmax
 mp_obj_t UPTVariable_softmax(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args) {
   HANDLE_TH_ERRORS

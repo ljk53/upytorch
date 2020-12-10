@@ -272,6 +272,36 @@ mp_obj_t UPTVariable_method_mul_(size_t n_args, const mp_obj_t* args, mp_map_t* 
   END_HANDLE_TH_ERRORS
 }
 
+// relu
+mp_obj_t UPTVariable_method_relu(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args) {
+  HANDLE_TH_ERRORS
+  Tensor& self = unpackTensor(*args++);
+  --n_args;
+  // aten::relu(Tensor self) -> Tensor
+  
+  auto dispatch_relu = [](Tensor & self) -> Tensor {
+    // pybind11::gil_scoped_release no_gil;
+    return self.relu();
+  };
+  return wrap(dispatch_relu(self));
+  END_HANDLE_TH_ERRORS
+}
+
+// relu_
+mp_obj_t UPTVariable_method_relu_(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args) {
+  HANDLE_TH_ERRORS
+  Tensor& self = unpackTensor(*args++);
+  --n_args;
+  // aten::relu_(Tensor(a!) self) -> Tensor(a!)
+  
+  auto dispatch_relu_ = [](Tensor & self) -> Tensor {
+    // pybind11::gil_scoped_release no_gil;
+    return self.relu_();
+  };
+  return wrap(dispatch_relu_(self));
+  END_HANDLE_TH_ERRORS
+}
+
 // softmax
 mp_obj_t UPTVariable_method_softmax(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args) {
   HANDLE_TH_ERRORS
