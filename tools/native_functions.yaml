@@ -1,5 +1,15 @@
 # Selected subset from pytorch/aten/src/ATen/native/native_functions.yaml
 
+- func: adaptive_avg_pool2d.out(Tensor self, int[2] output_size, *, Tensor(a!) out) -> Tensor(a!)
+  # python_module: nn
+  dispatch:
+    CPU, CUDA: adaptive_avg_pool2d_out_cpu
+    MkldnnCPU: mkldnn_adaptive_avg_pool2d_out
+
+- func: adaptive_avg_pool2d(Tensor self, int[2] output_size) -> Tensor
+  use_c10_dispatcher: full
+  # python_module: nn
+
 - func: add.Tensor(Tensor self, Tensor other, *, Scalar alpha=1) -> Tensor
   use_c10_dispatcher: full
   variants: function, method
@@ -96,9 +106,16 @@
     CPU: eye_out_cpu
     CUDA: eye_out_cuda
 
+- func: flatten.using_ints(Tensor(a) self, int start_dim=0, int end_dim=-1) -> Tensor(a)
+  use_c10_dispatcher: full
+  variants: function, method
+
 - func: matmul(Tensor self, Tensor other) -> Tensor
   use_c10_dispatcher: full
   variants: function, method
+
+- func: max_pool2d(Tensor self, int[2] kernel_size, int[2] stride=[], int[2] padding=0, int[2] dilation=1, bool ceil_mode=False) -> Tensor
+  use_c10_dispatcher: full
 
 - func: mm(Tensor self, Tensor mat2) -> Tensor
   use_c10_dispatcher: full

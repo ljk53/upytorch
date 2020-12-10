@@ -1,7 +1,10 @@
 import torch
+from .modules.utils import _list_with_default
+
 _VF = torch  # HACK!
 
 conv2d = torch.conv2d
+
 
 def linear(input, weight, bias=None):
     # type: (Tensor, Tensor, Optional[Tensor]) -> Tensor
@@ -29,6 +32,7 @@ def linear(input, weight, bias=None):
         ret = output
     return ret
 
+
 def relu(input: Tensor, inplace: bool = False) -> Tensor:
     r"""relu(input, inplace=False) -> Tensor
 
@@ -40,6 +44,7 @@ def relu(input: Tensor, inplace: bool = False) -> Tensor:
     else:
         result = torch.relu(input)
     return result
+
 
 # Activation functions
 def dropout(input, p=0.5, training=True, inplace=False):
@@ -62,3 +67,38 @@ def dropout(input, p=0.5, training=True, inplace=False):
     return (_VF.dropout_(input, p, training)
             if inplace
             else _VF.dropout(input, p, training))
+
+
+def _max_pool2d(input, kernel_size, stride=None, padding=0, dilation=1,
+                ceil_mode=False, return_indices=False):
+    # if stride is None:
+    #     stride = torch.jit.annotate(List[int], [])
+    return torch.max_pool2d(
+        input, kernel_size, stride, padding, dilation, ceil_mode)
+
+
+# max_pool2d = boolean_dispatch(
+#     arg_name='return_indices',
+#     arg_index=6,
+#     default=False,
+#     if_true=max_pool2d_with_indices,
+#     if_false=_max_pool2d,
+#     module_name=__name__,
+#     func_name='max_pool2d')
+max_pool2d = _max_pool2d
+
+
+def adaptive_avg_pool2d(input, output_size):
+    # type: (Tensor, BroadcastingList2[int]) -> Tensor
+    r"""
+    Applies a 2D adaptive average pooling over an input signal composed of
+    several input planes.
+
+    See :class:`~torch.nn.AdaptiveAvgPool2d` for details and output shape.
+
+    Args:
+        output_size: the target output size (single integer or
+            double-integer tuple)
+    """
+    _output_size = _list_with_default(output_size, [0, 0, 0]) # HACK: input.size()
+    return torch.adaptive_avg_pool2d(input, _output_size)

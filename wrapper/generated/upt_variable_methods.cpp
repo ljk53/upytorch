@@ -188,6 +188,27 @@ mp_obj_t UPTVariable_method_addmm_(size_t n_args, const mp_obj_t* args, mp_map_t
   END_HANDLE_TH_ERRORS
 }
 
+// flatten
+mp_obj_t UPTVariable_method_flatten(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args) {
+  HANDLE_TH_ERRORS
+  Tensor& self = unpackTensor(*args++);
+  --n_args;
+  static PythonArgParser parser({
+    "flatten(int64_t start_dim=0, int64_t end_dim=-1)",
+  });
+  ParsedArgs<2> parsed_args;
+  auto _r = parser.parse(*args, n_args, args, kw_args, parsed_args);
+  // aten::flatten.using_ints(Tensor(a) self, int start_dim=0, int end_dim=-1) -> Tensor(a)
+  
+  auto dispatch_flatten = [](Tensor & self, int64_t start_dim, int64_t end_dim) -> Tensor {
+    // pybind11::gil_scoped_release no_gil;
+    return self.flatten(start_dim, end_dim);
+  };
+  return wrap(dispatch_flatten(self, _r.toInt64(0), _r.toInt64(1)));
+  return mp_const_none;
+  END_HANDLE_TH_ERRORS
+}
+
 // matmul
 mp_obj_t UPTVariable_method_matmul(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args) {
   HANDLE_TH_ERRORS

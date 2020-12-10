@@ -16,6 +16,35 @@ using namespace upt;
 
 extern "C" {
 
+// adaptive_avg_pool2d
+mp_obj_t UPTVariable_adaptive_avg_pool2d(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args) {
+  HANDLE_TH_ERRORS
+  static PythonArgParser parser({
+    "adaptive_avg_pool2d(Tensor input, IntArrayRef[2] output_size, *, Tensor out=None)",
+  });
+  ParsedArgs<3> parsed_args;
+  auto _r = parser.parse(nullptr, n_args, args, kw_args, parsed_args);
+  if (_r.isNone(2)) {
+    // aten::adaptive_avg_pool2d(Tensor self, int[2] output_size) -> Tensor
+    
+    auto dispatch_adaptive_avg_pool2d = [](const Tensor & self, IntArrayRef output_size) -> Tensor {
+      // pybind11::gil_scoped_release no_gil;
+      return at::adaptive_avg_pool2d(self, output_size);
+    };
+    return wrap(dispatch_adaptive_avg_pool2d(_r.tensor(0), _r.intlist(1)));
+  } else {
+    // aten::adaptive_avg_pool2d.out(Tensor self, int[2] output_size, *, Tensor(a!) out) -> Tensor(a!)
+    
+    auto dispatch_adaptive_avg_pool2d_out = [](Tensor out, const Tensor & self, IntArrayRef output_size) -> Tensor {
+      // pybind11::gil_scoped_release no_gil;
+      return at::adaptive_avg_pool2d_out(out, self, output_size);
+    };
+    return wrap(dispatch_adaptive_avg_pool2d_out(_r.tensor(2), _r.tensor(0), _r.intlist(1)));
+  }
+  return mp_const_none;
+  END_HANDLE_TH_ERRORS
+}
+
 \
 // add
 mp_obj_t UPTVariable_add(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args) {
@@ -370,6 +399,25 @@ mp_obj_t UPTVariable_eye(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args)
   END_HANDLE_TH_ERRORS
 }
 
+// flatten
+mp_obj_t UPTVariable_flatten(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args) {
+  HANDLE_TH_ERRORS
+  static PythonArgParser parser({
+    "flatten(Tensor input, int64_t start_dim=0, int64_t end_dim=-1)",
+  });
+  ParsedArgs<3> parsed_args;
+  auto _r = parser.parse(nullptr, n_args, args, kw_args, parsed_args);
+  // aten::flatten.using_ints(Tensor(a) self, int start_dim=0, int end_dim=-1) -> Tensor(a)
+  
+  auto dispatch_flatten = [](const Tensor & self, int64_t start_dim, int64_t end_dim) -> Tensor {
+    // pybind11::gil_scoped_release no_gil;
+    return self.flatten(start_dim, end_dim);
+  };
+  return wrap(dispatch_flatten(_r.tensor(0), _r.toInt64(1), _r.toInt64(2)));
+  return mp_const_none;
+  END_HANDLE_TH_ERRORS
+}
+
 // matmul
 mp_obj_t UPTVariable_matmul(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args) {
   HANDLE_TH_ERRORS
@@ -385,6 +433,25 @@ mp_obj_t UPTVariable_matmul(size_t n_args, const mp_obj_t* args, mp_map_t* kw_ar
     return self.matmul(other);
   };
   return wrap(dispatch_matmul(_r.tensor(0), _r.tensor(1)));
+  return mp_const_none;
+  END_HANDLE_TH_ERRORS
+}
+
+// max_pool2d
+mp_obj_t UPTVariable_max_pool2d(size_t n_args, const mp_obj_t* args, mp_map_t* kw_args) {
+  HANDLE_TH_ERRORS
+  static PythonArgParser parser({
+    "max_pool2d(Tensor input, IntArrayRef[2] kernel_size, IntArrayRef[2] stride=None, IntArrayRef[2] padding=0, IntArrayRef[2] dilation=1, bool ceil_mode=False)",
+  });
+  ParsedArgs<6> parsed_args;
+  auto _r = parser.parse(nullptr, n_args, args, kw_args, parsed_args);
+  // aten::max_pool2d(Tensor self, int[2] kernel_size, int[2] stride=[], int[2] padding=0, int[2] dilation=1, bool ceil_mode=False) -> Tensor
+  
+  auto dispatch_max_pool2d = [](const Tensor & self, IntArrayRef kernel_size, IntArrayRef stride, IntArrayRef padding, IntArrayRef dilation, bool ceil_mode) -> Tensor {
+    // pybind11::gil_scoped_release no_gil;
+    return at::max_pool2d(self, kernel_size, stride, padding, dilation, ceil_mode);
+  };
+  return wrap(dispatch_max_pool2d(_r.tensor(0), _r.intlist(1), _r.intlist(2), _r.intlist(3), _r.intlist(4), _r.toBool(5)));
   return mp_const_none;
   END_HANDLE_TH_ERRORS
 }
