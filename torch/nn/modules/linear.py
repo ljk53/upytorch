@@ -50,9 +50,11 @@ class Linear(Module):
         super(Linear, self).__init__()
         self.in_features = in_features
         self.out_features = out_features
-        self.weight = torch.empty(out_features, in_features)
+        # HACK init
+        self.weight = torch.ones(out_features, in_features)
         if bias:
-            self.bias = torch.empty(out_features)
+            # HACK init
+            self.bias = torch.ones(out_features)
         else:
             self.register_parameter('bias', None)
         self.reset_parameters()
