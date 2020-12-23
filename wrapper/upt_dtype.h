@@ -31,7 +31,9 @@ extern mp_obj_type_t UPTDtypeClass;
   S(QUInt8, quint8) \
   S(QInt32, qint32) \
   S(BFloat16, bfloat16) \
-  S(QUInt4x2, quint4x2)
+
+// HACK: 1.7.0 prebuilt doesn't support
+//  S(QUInt4x2, quint4x2)
 
 // THPDtype
 struct UPTDtype {
