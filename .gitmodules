@@ -1,6 +1,7 @@
 [submodule "pytorch"]
 	path = pytorch
-	url = git@github.com:pytorch/pytorch
+	url = git@github.com:ljk53/pytorch
+	branch = upytorch
 [submodule "micropython"]
 	path = micropython
 	url = git@github.com:micropython/micropython
