@@ -1,6 +1,5 @@
 #include "upt_dtype.h"
-
-#include <torch/script.h>
+#include "libtorch.h"
 
 extern "C" {
 

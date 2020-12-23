@@ -34,3 +34,6 @@
 # Build
 build
 /build_*
+
+# Codegen
+/wrapper/generated/*

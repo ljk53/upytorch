@@ -35,10 +35,25 @@ ifeq ($(DEBUG), 1)
 CPPFLAGS += -g
 endif
 
+ifeq ($(LIBTORCH), local_lite)
+CPPFLAGS += -DBUILD_LITE
+LIBTORCH_LDFLAGS = \
+	-L $(LIBTORCH_DIR)/../lib \
+	-Wl,--gc-sections \
+	-Wl,--whole-archive \
+	-lc10 -ltorch -ltorch_cpu \
+	-Wl,--no-whole-archive \
+	-lpthreadpool \
+	-leigen_blas -lcpuinfo -lclog -lpthread -ldl
+	# -lnnpack -lXNNPACK -lpytorch_qnnpack
+BUILD_LITE = 1
+else
 LIBTORCH_LDFLAGS = \
 	-L $(LIBTORCH_DIR)/lib \
 	-Wl,-rpath,$(LIBTORCH_DIR)/lib \
 	-lc10 -ltorch -ltorch_cpu
+BUILD_LITE = 0
+endif
 
 MAKEUPYCROSS = make -C $(UPY_DIR)/mpy-cross
 MAKEUPY = make -C $(UPY_PORT_DIR) BUILD=$(BUILD_ROOT) PROG=$(PROG)
@@ -60,25 +75,51 @@ UPYFLAGSS = \
 	CFLAGS_EXTRA="-DMODULE_TORCH_ENABLED=1 -DMICROPY_MODULE_BUILTIN_INIT=1" \
 	LDFLAGS_EXTRA="$(LIBTORCH_LDFLAGS)"
 
+GENERATED_SRCS = \
+	wrapper/generated/upt_torch_functions.h \
+	wrapper/generated/upt_torch_functions.cpp \
+	wrapper/generated/upt_variable_methods.h \
+	wrapper/generated/upt_variable_methods.cpp
+
+SRCS = $(GENERATED_SRCS) $(wildcard wrapper/*.h wrapper/*.cpp)
+OBJS = $(patsubst %.cpp,%.o,$(SRCS))
+
 all: $(PROG)
 
-$(BUILD_ROOT)/linux:
+###############################################################################
+# LibTorch Variants - providing $(LIBTORCH_DIR)
+
+$(BUILD_ROOT)/linux/libtorch:
 	mkdir -p $(BUILD_ROOT)
 	cd $(BUILD_ROOT) && curl -LsO 'https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-1.7.0%2Bcpu.zip'
 	cd $(BUILD_ROOT) && unzip -qq -o libtorch-cxx11-abi-shared-with-deps-1.7.0%2Bcpu.zip -d linux
 
-$(BUILD_ROOT)/local:
+$(BUILD_ROOT)/local/libtorch:
 	scripts/build_pytorch.sh
 	mkdir -p $(BUILD_ROOT)/local
-	ln -s $(PYTORCH_ROOT)/torch $(BUILD_ROOT)/local/libtorch
+	ln -s $(PYTORCH_ROOT)/torch $(LIBTORCH_DIR)
 
-SRCS = $(wildcard wrapper/*.cpp wrapper/generated/*.cpp)
-OBJS = $(patsubst %.cpp,%.o,$(SRCS))
+$(BUILD_ROOT)/local_lite/libtorch:
+	BUILD_ROOT=$(BUILD_ROOT)/pytorch_lite scripts/build_pytorch_lite.sh
+	mkdir -p $(BUILD_ROOT)/local_lite
+	ln -s $(BUILD_ROOT)/pytorch_lite/install $(LIBTORCH_DIR)
+
+###############################################################################
+# Binding Codegen
+
+$(GENERATED_SRCS): tools/templates/*
+	BUILD_LITE=$(BUILD_LITE) scripts/run_codegen.sh
+
+###############################################################################
+# QStr Codegen
 
 $(BUILD_ROOT)/genhdr/qstrdefs.generated.h: wrapper/cmodule.c $(SRCS)
 	$(MAKEUPY) $(UPYFLAGSS) $(BUILD_ROOT)/genhdr/qstrdefs.generated.h
 
-%.o: %.cpp $(BUILD_ROOT)/$(LIBTORCH) wrapper/*.h $(BUILD_ROOT)/genhdr/qstrdefs.generated.h
+###############################################################################
+# Build
+
+%.o: %.cpp $(LIBTORCH_DIR) $(BUILD_ROOT)/genhdr/qstrdefs.generated.h wrapper/*.h
 	$(CXX) $(CPPFLAGS) -c $< -o $@
 
 wrapper/libwrapper.a: $(OBJS)
@@ -101,5 +142,6 @@ upy:
 clean:
 	$(MAKEUPY) clean
 	rm -rf build
-	rm -f wrapper/*.o wrapper/*.a wrapper/*.so wrapper/generated/*.o
+	rm -rf wrapper/generated
+	rm -f wrapper/*.o wrapper/*.a wrapper/*.so
 	rm -f upy upy.map

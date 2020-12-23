@@ -10,18 +10,32 @@ from tools.codegen.api.python import (
     PythonSignatureNativeFunctionPair, PythonSignatureGroup, PythonSignature,
     PythonOutArgument, DispatchLambdaArgumentExprs, TENSOR_OPTIONS_FIELDS,
     dispatch_lambda_args, dispatch_lambda_return_str,
-    cpp_dispatch_target, cpp_dispatch_exprs,
+    cpp_dispatch_exprs,
     arg_parser_output_exprs,
     has_tensor_options,
 )
 
-from tools.codegen.model import NativeFunction, BaseOperatorName
+from tools.codegen.model import NativeFunction, BaseOperatorName, Variant
 
 from tools.codegen.gen import cpp_string, with_native_function, FileManager
 from tools.autograd.gen_python_functions import (
     is_noarg, is_py_torch_function, is_py_variable_method,
     load_signatures, group_overloads,
 )
+
+parser = argparse.ArgumentParser(
+    description='Generate MicroPython Torch binding files script')
+parser.add_argument('--native_functions',
+                    help='path to native_functions.yaml')
+parser.add_argument('--deprecated',
+                    help='path to deprecated.yaml')
+parser.add_argument('--codegen_root',
+                    help='path to codegen root directory')
+parser.add_argument('--inference_only', action='store_true',
+                    help='inference only build mode')
+parser.add_argument('--out',
+                    help='path to output directory')
+args = parser.parse_args()
 
 def gen(
     native_yaml_path: str,
@@ -307,6 +321,19 @@ return wrap(dispatch_{name}({lambda_args}){set_requires_grad});
 
     return go(f)
 
+# Dispatch factory method call to 'at::' instead of 'torch::' for inference only build.
+def cpp_dispatch_target(f: NativeFunction) -> str:
+    name = cpp.name(f.func)
+    if Variant.method in f.variants:
+        return f'self.{name}'
+    if Variant.function in f.variants:
+        if has_tensor_options(f) or f.func.name.name.base.endswith('_like'):
+            namespace = 'at' if args.inference_only else 'torch'
+        else:
+            namespace = 'at'
+        return f'{namespace}::{name}'
+    raise RuntimeError(f'could not dispatch, neither function nor method: {f.func}')
+
 # HACK - temporary clone to bypass unsupported cases
 def dispatch_lambda_exprs(
     ps: PythonSignature, f: NativeFunction
@@ -386,17 +413,6 @@ const auto options = TensorOptions()
     )
 
 def main() -> None:
-    parser = argparse.ArgumentParser(
-        description='Generate MicroPython Torch binding files script')
-    parser.add_argument('--native_functions',
-                        help='path to native_functions.yaml')
-    parser.add_argument('--deprecated',
-                        help='path to deprecated.yaml')
-    parser.add_argument('--codegen_root',
-                        help='path to codegen root directory')
-    parser.add_argument('--out',
-                        help='path to output directory')
-    args = parser.parse_args()
     gen(args.native_functions, args.deprecated, args.codegen_root, args.out)
 
 if __name__ == "__main__":

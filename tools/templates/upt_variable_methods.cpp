@@ -3,15 +3,20 @@
 // See: pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp
 
 #include <iostream>
-#include <torch/script.h>
 
+#include "libtorch.h"
 #include "exception.h"
 #include "type_utils.h"
 #include "upt_arg_parser.h"
 #include "upt_variable.h"
 
+#ifdef BUILD_LITE
+using namespace at;
+#else
 using namespace torch;
 using namespace torch::autograd;
+#endif
+
 using namespace upt;
 
 extern "C" {
