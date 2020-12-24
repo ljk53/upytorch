@@ -44,8 +44,8 @@ LIBTORCH_LDFLAGS = \
 	-lc10 -ltorch -ltorch_cpu \
 	-Wl,--no-whole-archive \
 	-lpthreadpool \
-	-leigen_blas -lcpuinfo -lclog -lpthread -ldl
-	# -lnnpack -lXNNPACK -lpytorch_qnnpack
+	-lcpuinfo -lclog -lpthread -ldl
+	# -lnnpack -lXNNPACK -lpytorch_qnnpack -leigen_blas
 BUILD_LITE = 1
 else
 LIBTORCH_LDFLAGS = \
