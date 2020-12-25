@@ -36,7 +36,8 @@ CPPFLAGS += -g
 endif
 
 ifeq ($(LIBTORCH), local_lite)
-CPPFLAGS += -DBUILD_LITE
+# TODO: should export USE_STATIC_DISPATCH in pytorch public headers?
+CPPFLAGS += -DBUILD_LITE -DNO_EXPORT -DUSE_STATIC_DISPATCH
 LIBTORCH_LDFLAGS = \
 	-L $(LIBTORCH_DIR)/../lib \
 	-Wl,--gc-sections \
