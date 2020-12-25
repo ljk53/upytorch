@@ -1,5 +1,6 @@
 LIBTORCH ?= local
 
+UNAME := $(shell uname)
 PYTORCH_ROOT ?= $(CURDIR)/pytorch
 CXX11_ABI ?= 1
 
@@ -36,31 +37,45 @@ CPPFLAGS += -g
 endif
 
 ifeq ($(LIBTORCH), local_lite)
+BUILD_LITE = 1
 # TODO: should export USE_STATIC_DISPATCH in pytorch public headers?
 CPPFLAGS += -DBUILD_LITE -DNO_EXPORT -DUSE_STATIC_DISPATCH
+
+ifeq ($(UNAME), Linux)
 LIBTORCH_LDFLAGS = \
 	-L $(LIBTORCH_DIR)/../lib \
+	-Wl,-Map=$(BUILD_ROOT)/output.map \
+	-Wl,--cref \
 	-Wl,--gc-sections \
 	-Wl,--whole-archive \
 	-lc10 -ltorch -ltorch_cpu \
 	-Wl,--no-whole-archive \
 	-lpthreadpool \
 	-lcpuinfo -lclog -lpthread -ldl
+	# -Wl,--print-gc-sections
 	# -lnnpack -lXNNPACK -lpytorch_qnnpack -leigen_blas
-BUILD_LITE = 1
+else ifeq ($(UNAME), Darwin)
+LIBTORCH_LDFLAGS = \
+	-L $(LIBTORCH_DIR)/../lib \
+	-Wl,-dead_strip \
+	-Wl,-all_load \
+	-lc10 -ltorch -ltorch_cpu \
+	-lpthreadpool \
+	-lcpuinfo -lclog -lpthread -ldl
+endif
+
 else
+BUILD_LITE = 0
 LIBTORCH_LDFLAGS = \
 	-L $(LIBTORCH_DIR)/lib \
 	-Wl,-rpath,$(LIBTORCH_DIR)/lib \
 	-lc10 -ltorch -ltorch_cpu
-BUILD_LITE = 0
 endif
 
 MAKEUPYCROSS = make -C $(UPY_DIR)/mpy-cross
 MAKEUPY = make -C $(UPY_PORT_DIR) BUILD=$(BUILD_ROOT) PROG=$(PROG)
 
 UPYFLAGS = \
-	MICROPY_USE_READLINE=0 \
 	MICROPY_PY_BTREE=0 \
 	MICROPY_PY_TERMIOS=0 \
 	MICROPY_PY_SOCKET=0 \
@@ -69,6 +84,11 @@ UPYFLAGS = \
 	MICROPY_PY_AXTLS=0 \
 	MICROPY_FATFS=0 \
 	MICROPY_PY_THREAD=0
+
+ifneq ($(UNAME), Darwin)
+# HACK: OS X doesn't compile with readline = 0
+UPYFLAGS += MICROPY_USE_READLINE=0
+endif
 
 UPYFLAGSS = \
 	$(UPYFLAGS) \
@@ -83,7 +103,7 @@ GENERATED_SRCS = \
 	wrapper/generated/upt_variable_methods.cpp
 
 SRCS = $(GENERATED_SRCS) $(wildcard wrapper/*.h wrapper/*.cpp)
-OBJS = $(patsubst %.cpp,%.o,$(SRCS))
+OBJS = $(patsubst %.cpp,%.o,$(filter %.cpp,$(SRCS)))
 
 all: $(PROG)
 
