@@ -20,6 +20,7 @@ AR = ar
 CPPFLAGS = \
 	-std=c++14 \
 	-Os \
+	-ffunction-sections -fdata-sections -fvisibility=hidden -fvisibility-inlines-hidden \
 	-Wall -Werror \
 	-D_GLIBCXX_USE_CXX11_ABI=$(CXX11_ABI) \
 	-I $(UPY_DIR) \
