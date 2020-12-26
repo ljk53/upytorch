@@ -1,7 +1,7 @@
 #pragma once
 
-#ifdef BUILD_LITE
 #include <ATen/ATen.h>
-#else
+
+#ifndef BUILD_LITE
 #include <torch/script.h>
 #endif
