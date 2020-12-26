@@ -1,8 +1,9 @@
 import argparse
 import os
+import yaml
 
 from collections import defaultdict
-from typing import Optional, Sequence, Tuple, List, Dict, Callable
+from typing import Callable, Dict, List, Optional, Sequence, Set, Tuple
 
 from tools.codegen.code_template import CodeTemplate
 import tools.codegen.api.cpp as cpp
@@ -23,6 +24,12 @@ from tools.autograd.gen_python_functions import (
     load_signatures, group_overloads,
 )
 
+try:
+    # use faster C loader if available
+    from yaml import CLoader as Loader
+except ImportError:
+    from yaml import Loader  # type: ignore
+
 parser = argparse.ArgumentParser(
     description='Generate MicroPython Torch binding files script')
 parser.add_argument('--native_functions',
@@ -33,6 +40,8 @@ parser.add_argument('--codegen_root',
                     help='path to codegen root directory')
 parser.add_argument('--inference_only', action='store_true',
                     help='inference only build mode')
+parser.add_argument('--op_selection_yaml',
+                    help='path to operator selection config')
 parser.add_argument('--out',
                     help='path to output directory')
 args = parser.parse_args()
@@ -41,6 +50,7 @@ def gen(
     native_yaml_path: str,
     deprecated_yaml_path: str,
     codegen_root_path: str,
+    selector: Optional[Set[str]],
     output_path: str,
 ) -> None:
     fm = FileManager(
@@ -48,24 +58,30 @@ def gen(
         template_dir=os.path.join(codegen_root_path, 'templates'),
         dry_run=False)
 
-    methods = load_signatures(native_yaml_path, deprecated_yaml_path, method=True)
+    def is_selected(pair: PythonSignatureNativeFunctionPair) -> bool:
+        # TODO: should move this to pytorch codegen
+        return selector is None or f'aten::{pair.function.func.name}' in selector
+
+    methods = list(filter(is_selected,
+        load_signatures(native_yaml_path, deprecated_yaml_path, method=True)))
     create_upy_bindings(
         fm, methods,
-        lambda f: is_py_variable_method(f),
+        lambda f: Variant.method in f.variants,  # ignore python_module
         'torch', 'upt_variable_methods.cpp', method=True)
     create_upy_bindings(
         fm, methods,
-        lambda f: is_py_variable_method(f),
+        lambda f: Variant.method in f.variants,  # ignore python_module
         'torch', 'upt_variable_methods.h', method=True)
 
-    functions = load_signatures(native_yaml_path, deprecated_yaml_path, method=False)
+    functions = list(filter(is_selected,
+        load_signatures(native_yaml_path, deprecated_yaml_path, method=False)))
     create_upy_bindings(
         fm, functions,
-        lambda f: is_py_torch_function(f),
+        lambda f: Variant.function in f.variants,  # ignore python_module
         'torch', 'upt_torch_functions.cpp', method=False)
     create_upy_bindings(
         fm, functions,
-        lambda f: is_py_torch_function(f),
+        lambda f: Variant.function in f.variants,  # ignore python_module
         'torch', 'upt_torch_functions.h', method=False)
 
 def create_upy_bindings(
@@ -413,7 +429,11 @@ const auto options = TensorOptions()
     )
 
 def main() -> None:
-    gen(args.native_functions, args.deprecated, args.codegen_root, args.out)
+    selected_ops: Optional[Set[str]] = None
+    if args.op_selection_yaml is not None:
+        with open(args.op_selection_yaml, 'r') as f:
+            selected_ops = set(yaml.load(f, Loader=Loader))
+    gen(args.native_functions, args.deprecated, args.codegen_root, selected_ops, args.out)
 
 if __name__ == "__main__":
     main()

@@ -12,6 +12,7 @@ BUILD_ROOT ?= $(CURDIR)/build
 LIBTORCH_DIR = $(BUILD_ROOT)/$(LIBTORCH)/libtorch
 
 PROG ?= $(BUILD_ROOT)/upytorch
+OP_SELECTION_YAML ?= $(CURDIR)/tools/dev.yaml
 
 CP = cp
 CXX = g++
@@ -129,8 +130,8 @@ $(BUILD_ROOT)/local_lite/libtorch:
 ###############################################################################
 # Binding Codegen
 
-$(GENERATED_SRCS): tools/templates/*
-	BUILD_LITE=$(BUILD_LITE) scripts/run_codegen.sh
+$(GENERATED_SRCS): tools/templates/* $(OP_SELECTION_YAML)
+	BUILD_LITE=$(BUILD_LITE) OP_SELECTION_YAML=$(OP_SELECTION_YAML) scripts/run_codegen.sh
 
 ###############################################################################
 # QStr Codegen
