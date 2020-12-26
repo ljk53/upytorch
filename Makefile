@@ -47,16 +47,18 @@ CPPFLAGS += $(LITE_CPPFLAGS)
 ifeq ($(UNAME), Linux)
 LIBTORCH_LDFLAGS = \
 	-L $(LIBTORCH_DIR)/../lib \
-	-Wl,-Map=$(BUILD_ROOT)/output.map \
-	-Wl,--cref \
 	-Wl,--gc-sections \
 	-Wl,--whole-archive \
 	-lc10 -ltorch -ltorch_cpu \
 	-Wl,--no-whole-archive \
 	-lpthreadpool \
 	-lcpuinfo -lclog -lpthread -ldl
-	# -Wl,--print-gc-sections
 	# -lnnpack -lXNNPACK -lpytorch_qnnpack -leigen_blas
+
+ifeq ($(WHY_LIVE), 1)
+LIBTORCH_LDFLAGS += -Wl,-Map=$(BUILD_ROOT)/output.map -Wl,--cref -Wl,--print-gc-sections
+endif
+
 else ifeq ($(UNAME), Darwin)
 LIBTORCH_LDFLAGS = \
 	-L $(LIBTORCH_DIR)/../lib \
@@ -65,6 +67,11 @@ LIBTORCH_LDFLAGS = \
 	-lc10 -ltorch -ltorch_cpu \
 	-lpthreadpool \
 	-lcpuinfo -lclog -lpthread -ldl
+
+ifeq ($(WHY_LIVE), 1)
+LIBTORCH_LDFLAGS += -Wl,-why_live,*
+endif
+
 endif
 
 else
