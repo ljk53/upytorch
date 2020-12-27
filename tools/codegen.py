@@ -20,8 +20,7 @@ from tools.codegen.model import NativeFunction, BaseOperatorName, Variant
 
 from tools.codegen.gen import cpp_string, with_native_function, FileManager
 from tools.autograd.gen_python_functions import (
-    is_noarg, is_py_torch_function, is_py_variable_method,
-    load_signatures, group_overloads,
+    is_noarg, load_signatures, group_overloads,
 )
 
 try:
@@ -63,7 +62,7 @@ def gen(
         return selector is None or f'aten::{pair.function.func.name}' in selector
 
     methods = list(filter(is_selected,
-        load_signatures(native_yaml_path, deprecated_yaml_path, method=True)))
+                   load_signatures(native_yaml_path, deprecated_yaml_path, method=True)))
     create_upy_bindings(
         fm, methods,
         lambda f: Variant.method in f.variants,  # ignore python_module
@@ -74,7 +73,7 @@ def gen(
         'torch', 'upt_variable_methods.h', method=True)
 
     functions = list(filter(is_selected,
-        load_signatures(native_yaml_path, deprecated_yaml_path, method=False)))
+                     load_signatures(native_yaml_path, deprecated_yaml_path, method=False)))
     create_upy_bindings(
         fm, functions,
         lambda f: Variant.function in f.variants,  # ignore python_module
