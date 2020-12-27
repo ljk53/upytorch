@@ -1,0 +1,9 @@
+- aten::adaptive_avg_pool2d
+- aten::addmm
+- aten::conv2d
+- aten::dropout
+- aten::flatten.using_ints
+- aten::max_pool2d
+- aten::ones
+- aten::relu_
+- aten::t

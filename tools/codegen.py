@@ -432,7 +432,7 @@ def main() -> None:
     selected_ops: Optional[Set[str]] = None
     if args.op_selection_yaml is not None:
         with open(args.op_selection_yaml, 'r') as f:
-            selected_ops = set(yaml.load(f, Loader=Loader))
+            selected_ops = set(yaml.load(f, Loader=Loader) or [])
     gen(args.native_functions, args.deprecated, args.codegen_root, selected_ops, args.out)
 
 if __name__ == "__main__":
