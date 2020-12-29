@@ -117,10 +117,15 @@ all: $(PROG)
 ###############################################################################
 # LibTorch Variants - providing $(LIBTORCH_DIR)
 
-$(BUILD_ROOT)/linux/libtorch:
+$(BUILD_ROOT)/prebuilt/libtorch:
 	mkdir -p $(BUILD_ROOT)
-	cd $(BUILD_ROOT) && curl -LsO 'https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-1.7.0%2Bcpu.zip'
-	cd $(BUILD_ROOT) && unzip -qq -o libtorch-cxx11-abi-shared-with-deps-1.7.0%2Bcpu.zip -d linux
+ifeq ($(UNAME), Linux)
+	cd $(BUILD_ROOT) && curl -LsO 'https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-1.7.1%2Bcpu.zip'
+	cd $(BUILD_ROOT) && unzip -qq -o libtorch-cxx11-abi-shared-with-deps-1.7.1%2Bcpu.zip -d prebuilt
+else ifeq ($(UNAME), Darwin)
+	cd $(BUILD_ROOT) && curl -LsO 'https://download.pytorch.org/libtorch/cpu/libtorch-macos-1.7.1.zip'
+	cd $(BUILD_ROOT) && unzip -qq -o libtorch-macos-1.7.1.zip -d prebuilt
+endif
 
 $(BUILD_ROOT)/local/libtorch:
 	scripts/build_pytorch.sh
