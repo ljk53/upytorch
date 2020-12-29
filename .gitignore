@@ -32,8 +32,15 @@
 *.app
 
 # Build
-build
+*build
+*build-*
 /build_*
 
 # Codegen
 /wrapper/generated/*
+
+# vscode
+.vscode
+
+# Python Cache
+__pycache__
