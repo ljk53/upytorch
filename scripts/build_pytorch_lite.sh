@@ -1,10 +1,7 @@
 #!/bin/bash
 ##############################################################################
-# Example command to build the mobile target.
+# Example command to build the lightweight libtorch target.
 ##############################################################################
-#
-# This script shows how one can build a libtorch library optimized for mobile
-# devices using host toolchain.
 
 set -e
 
@@ -19,16 +16,6 @@ CMAKE_ARGS+=("-DCMAKE_PREFIX_PATH=$(python -c 'from distutils.sysconfig import g
 CMAKE_ARGS+=("-DPYTHON_EXECUTABLE=$(python -c 'import sys; print(sys.executable)')")
 CMAKE_ARGS+=("-DBUILD_CUSTOM_PROTOBUF=OFF")
 CMAKE_ARGS+=("-DBUILD_SHARED_LIBS=OFF")
-# custom build with selected ops
-if [ -n "${SELECTED_OP_LIST}" ]; then
-  SELECTED_OP_LIST="$(cd $(dirname $SELECTED_OP_LIST); pwd -P)/$(basename $SELECTED_OP_LIST)"
-  echo "Choose SELECTED_OP_LIST file: $SELECTED_OP_LIST"
-  if [ ! -r ${SELECTED_OP_LIST} ]; then
-    echo "Error: SELECTED_OP_LIST file ${SELECTED_OP_LIST} not found."
-    exit 1
-  fi
-  CMAKE_ARGS+=("-DSELECTED_OP_LIST=${SELECTED_OP_LIST}")
-fi
 
 # If Ninja is installed, prefer it to Make
 if [ -x "$(command -v ninja)" ]; then
@@ -58,7 +45,7 @@ fi
 # Use-specified CMake arguments go last to allow overridding defaults
 CMAKE_ARGS+=("$@")
 
-# Now, actually build the Android target.
+# Now, actually build the libtorch target.
 BUILD_ROOT=${BUILD_ROOT:-"$PYTORCH_ROOT/build_pytorch_lite"}
 INSTALL_PREFIX=${BUILD_ROOT}/install
 mkdir -p $BUILD_ROOT
