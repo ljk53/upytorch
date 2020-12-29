@@ -33,7 +33,8 @@ if [ -x "$(command -v ninja)" ]; then
 fi
 
 CMAKE_ARGS+=("-DCMAKE_TOOLCHAIN_FILE=$SRC_ROOT/esp32/esp-idf/tools/cmake/toolchain-esp32.cmake")
-CMAKE_ARGS+=("-DCMAKE_CXX_FLAGS='-DESP_PLATFORM'")
+CMAKE_ARGS+=("-DCMAKE_C_FLAGS='-mlongcalls -DESP_PLATFORM'")
+CMAKE_ARGS+=("-DCMAKE_CXX_FLAGS='-mlongcalls -DESP_PLATFORM'")
 
 # Disable unused dependencies
 CMAKE_ARGS+=("-DBUILD_LITE=ON")

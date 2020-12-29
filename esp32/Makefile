@@ -331,7 +331,7 @@ ESPIDF_SOC_O = $(patsubst %.c,%.o,\
 	)
 
 $(BUILD)/$(ESPCOMP)/cxx/cxx_guards.o: CXXFLAGS += -Wno-error=sign-compare
-ESPIDF_CXX_O = $(patsubst %.cpp,%.o,$(wildcard $(ESPCOMP)/cxx/*.cpp))
+ESPIDF_CXX_O = $(patsubst %.cpp,%.o,$(filter-out $(ESPCOMP)/cxx/cxx_exception_stubs.cpp,$(wildcard $(ESPCOMP)/cxx/*.cpp)))
 
 ESPIDF_PTHREAD_O = $(patsubst %.c,%.o,$(wildcard $(ESPCOMP)/pthread/*.c))
 
@@ -363,7 +363,7 @@ ESPIDF_APP_TRACE_O = $(patsubst %.c,%.o,$(wildcard $(ESPCOMP)/app_trace/*.c))
 
 ESPIDF_APP_UPDATE_O = $(patsubst %.c,%.o,$(wildcard $(ESPCOMP)/app_update/*.c))
 
-ESPIDF_NEWLIB_O = $(patsubst %.c,%.o,$(wildcard $(ESPCOMP)/newlib/*.c))
+ESPIDF_NEWLIB_O = $(patsubst %.c,%.o,$(filter-out $(ESPCOMP)/newlib/heap.c,$(wildcard $(ESPCOMP)/newlib/*.c)))
 
 $(BUILD)/$(ESPCOMP)/nvs_flash/src/nvs_api.o: CXXFLAGS += -Wno-error=sign-compare
 ESPIDF_NVS_FLASH_O = $(patsubst %.cpp,%.o,$(wildcard $(ESPCOMP)/nvs_flash/src/*.cpp))
@@ -419,6 +419,9 @@ ESPIDF_XTENSA_O = $(patsubst %.c,%.o,\
     $(wildcard $(ESPCOMP)/xtensa/esp32/*.c) \
     )
 
+# Hacks to fix ESP-IDF libc++ link error:
+ESPIDF_HACKS_O = $(patsubst %.c,%.o,$(patsubst %.cpp,%.o,$(wildcard $(CURDIR)/hacks/*)))
+
 OBJ_ESPIDF =
 LIB_ESPIDF =
 BUILD_ESPIDF_LIB = $(BUILD)/esp-idf
@@ -463,6 +466,7 @@ $(eval $(call gen_espidf_lib_rule,esp_event,$(ESPIDF_ESP_EVENT_O)))
 $(eval $(call gen_espidf_lib_rule,esp_wifi,$(ESPIDF_ESP_WIFI_O)))
 $(eval $(call gen_espidf_lib_rule,esp_eth,$(ESPIDF_ESP_ETH_O)))
 $(eval $(call gen_espidf_lib_rule,xtensa,$(ESPIDF_XTENSA_O)))
+$(eval $(call gen_espidf_lib_rule,hacks,$(ESPIDF_HACKS_O)))
 
 # Create all destination build dirs before compiling IDF source
 OBJ_ESPIDF_DIRS = $(sort $(dir $(OBJ_ESPIDF))) $(BUILD_ESPIDF_LIB) $(addprefix $(BUILD_ESPIDF_LIB)/,$(LIB_ESPIDF))
@@ -530,17 +534,18 @@ erase:
 OBJ = $(OBJ_MP)
 
 APP_LD_ARGS =
-APP_LD_ARGS += $(LDFLAGS_MOD)
 APP_LD_ARGS += $(addprefix -T,$(LD_FILES))
 APP_LD_ARGS += --start-group
 APP_LD_ARGS += -L$(dir $(LIBGCC_FILE_NAME)) -lgcc
-APP_LD_ARGS += -L$(dir $(LIBSTDCXX_FILE_NAME)) -lstdc++
 APP_LD_ARGS += $(LIBC_LIBM)
 APP_LD_ARGS += -L$(ESPCOMP)/xtensa/esp32 -lhal
 APP_LD_ARGS += -L$(ESPCOMP)/bt/controller/lib -lbtdm_app
 APP_LD_ARGS += -L$(ESPCOMP)/esp_wifi/lib_esp32 -lcore -lmesh -lnet80211 -lphy -lrtc -lpp -lsmartconfig -lcoexist
 APP_LD_ARGS += $(OBJ)
 APP_LD_ARGS += $(LIB)
+# stdc++ has to come after cxx.a: https://github.com/letscontrolit/ESPEasy/pull/1789#issuecomment-423834356
+APP_LD_ARGS += -L$(dir $(LIBSTDCXX_FILE_NAME)) -lstdc++
+APP_LD_ARGS += $(LDFLAGS_MOD)
 APP_LD_ARGS += --end-group
 
 $(BUILD)/esp32_out.ld: $(SDKCONFIG_H)
@@ -551,8 +556,8 @@ $(BUILD)/application.bin: $(BUILD)/application.elf
 	$(Q)$(ESPTOOL) --chip esp32 elf2image --flash_mode $(FLASH_MODE) --flash_freq $(FLASH_FREQ) --flash_size $(FLASH_SIZE) $<
 
 $(BUILD)/application.elf: $(OBJ) $(LIB) $(BUILD)/esp32_out.ld $(BUILD)/esp32.project.ld
-	$(ECHO) "LINK $@"
-	$(Q)$(LD) $(LDFLAGS) -o $@ $(APP_LD_ARGS)
+	$(ECHO) "LINK $@ : $(LDFLAGS) $(LDFLAGS_EXTRA) -o $@ $(APP_LD_ARGS)"
+	$(Q)$(LD) $(LDFLAGS) $(LDFLAGS_EXTRA) -o $@ $(APP_LD_ARGS)
 	$(Q)$(SIZE) $@
 
 define compile_cxx
