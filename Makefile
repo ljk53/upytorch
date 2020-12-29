@@ -21,6 +21,7 @@ AR = ar
 CPPFLAGS = \
 	-std=c++14 \
 	-Os \
+	-ffunction-sections -fdata-sections -fvisibility=hidden -fvisibility-inlines-hidden \
 	-Wall -Werror \
 	-D_GLIBCXX_USE_CXX11_ABI=$(CXX11_ABI) \
 	-I $(UPY_DIR) \
@@ -33,16 +34,12 @@ CPPFLAGS = \
 	-I wrapper \
 	-I $(BUILD_ROOT)
 
-LITE_CPPFLAGS = \
-	-ffunction-sections -fdata-sections -fvisibility=hidden -fvisibility-inlines-hidden
-
 ifeq ($(DEBUG), 1)
 CPPFLAGS += -g
 endif
 
 ifeq ($(LIBTORCH), local_lite)
 BUILD_LITE = 1
-CPPFLAGS += $(LITE_CPPFLAGS)
 
 ifeq ($(UNAME), Linux)
 LIBTORCH_LDFLAGS = \
@@ -131,7 +128,7 @@ $(BUILD_ROOT)/local/libtorch:
 	ln -s $(PYTORCH_ROOT)/torch $(LIBTORCH_DIR)
 
 $(BUILD_ROOT)/local_lite/libtorch:
-	BUILD_ROOT=$(BUILD_ROOT)/pytorch_lite scripts/build_pytorch_lite.sh -DCMAKE_CXX_FLAGS="$(LITE_CPPFLAGS)"
+	BUILD_ROOT=$(BUILD_ROOT)/pytorch_lite scripts/build_pytorch_lite.sh
 	mkdir -p $(BUILD_ROOT)/local_lite
 	ln -s $(BUILD_ROOT)/pytorch_lite/install $(LIBTORCH_DIR)
 
