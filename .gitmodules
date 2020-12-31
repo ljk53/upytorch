@@ -1,10 +1,10 @@
 [submodule "pytorch"]
 	path = pytorch
-	url = git@github.com:ljk53/pytorch
+	url = https://github.com/ljk53/pytorch.git
 	branch = upytorch
 [submodule "micropython"]
 	path = micropython
-	url = git@github.com:micropython/micropython
+	url = https://github.com/micropython/micropython.git
 [submodule "esp32/esp-idf"]
 	path = esp32/esp-idf
 	url = https://github.com/espressif/esp-idf.git

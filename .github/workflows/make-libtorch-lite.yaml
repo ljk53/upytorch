@@ -1,0 +1,69 @@
+name: Statically linked with customized lite-libtorch
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-without-ops:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: checkout submodules
+      run: git submodule update --init --recursive micropython pytorch
+
+    - name: setup python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+
+    - name: install pip dependency
+      run: |
+        python3 -m pip install --upgrade pip
+        pip install -r pytorch/requirements.txt
+
+    - name: make
+      run: LIBTORCH=local_lite OP_SELECTION_YAML=tools/noop.yaml make
+
+    - name: show binary size
+      run: |
+        strip build/upytorch -o build/upytorch.strip
+        tar zcvf build/upytorch.tar.gz build/upytorch.strip
+        ls -la build/upytorch*
+
+  build-for-alexnet:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: checkout submodules
+      run: git submodule update --init --recursive micropython pytorch
+
+    - name: setup python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+
+    - name: install pip dependency
+      run: |
+        python3 -m pip install --upgrade pip
+        pip install -r pytorch/requirements.txt
+
+    - name: make
+      run: LIBTORCH=local_lite OP_SELECTION_YAML=tools/alexnet.yaml make
+
+    - name: run AlexNet
+      run: MICROPYPATH=. build/upytorch -c 'from benchmark.alexnet import alexnet; alexnet()(1)'
+
+    - name: show binary size
+      run: |
+        strip build/upytorch -o build/upytorch.strip
+        tar zcvf build/upytorch.tar.gz build/upytorch.strip
+        ls -la build/upytorch*
