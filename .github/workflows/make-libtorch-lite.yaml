@@ -1,4 +1,4 @@
-name: Statically linked with customized lite-libtorch
+name: statically linked lite-libtorch
 
 on:
   push:
@@ -7,7 +7,42 @@ on:
     branches: [ main ]
 
 jobs:
-  build-without-ops:
+  build_platform-macos_libtorch-lite_ops-noop:
+
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: checkout submodules
+      run: git submodule update --init --recursive micropython pytorch
+
+    - name: setup python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+
+    - name: install pip dependency
+      run: |
+        python3 -m pip install --upgrade pip
+        pip install -r pytorch/requirements.txt
+
+    - name: make
+      run: LIBTORCH=local_lite OP_SELECTION_YAML=tools/noop.yaml make
+
+    - name: show binary size
+      run: |
+        strip build/upytorch -o build/upytorch.strip
+        tar zcvf build/upytorch.tar.gz build/upytorch.strip
+        ls -la build/upytorch*
+
+    - name: upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: platform-macos.libtorch-lite.ops-noop
+        path: build/upytorch.strip
+
+  build_platform-linux_libtorch-lite_ops-noop:
 
     runs-on: ubuntu-latest
 
@@ -36,7 +71,51 @@ jobs:
         tar zcvf build/upytorch.tar.gz build/upytorch.strip
         ls -la build/upytorch*
 
-  build-for-alexnet:
+    - name: upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: platform-linux.libtorch-lite.ops-noop
+        path: build/upytorch.strip
+
+  build_platform-macos_libtorch-lite_ops-alexnet:
+
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: checkout submodules
+      run: git submodule update --init --recursive micropython pytorch
+
+    - name: setup python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+
+    - name: install pip dependency
+      run: |
+        python3 -m pip install --upgrade pip
+        pip install -r pytorch/requirements.txt
+
+    - name: make
+      run: LIBTORCH=local_lite OP_SELECTION_YAML=tools/alexnet.yaml make
+
+    - name: run AlexNet
+      run: MICROPYPATH=. build/upytorch -c 'from benchmark.alexnet import alexnet; alexnet()(1)'
+
+    - name: show binary size
+      run: |
+        strip build/upytorch -o build/upytorch.strip
+        tar zcvf build/upytorch.tar.gz build/upytorch.strip
+        ls -la build/upytorch*
+
+    - name: upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: platform-macos.libtorch-lite.ops-alexnet
+        path: build/upytorch.strip
+
+  build_platform-linux_libtorch-lite_ops-alexnet:
 
     runs-on: ubuntu-latest
 
@@ -67,3 +146,9 @@ jobs:
         strip build/upytorch -o build/upytorch.strip
         tar zcvf build/upytorch.tar.gz build/upytorch.strip
         ls -la build/upytorch*
+
+    - name: upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: platform-linux.libtorch-lite.ops-alexnet
+        path: build/upytorch.strip

@@ -1,0 +1,53 @@
+name: ESP32 firmware
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build_platform-esp_libtorch-lite_ops-dev:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: checkout submodules
+      run: |
+        git submodule update --init --recursive micropython pytorch esp32/esp-idf
+        echo "ESP_REV=$(cd esp32/esp-idf; git rev-parse HEAD)" >> $GITHUB_ENV
+
+    - name: setup python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+
+    - name: cache ESP-IDF toolchain
+      uses: actions/cache@v2
+      env:
+        cache-name: cache-esp-idf-toolchain
+      with:
+        path: ~/.espressif
+        key: ${{ runner.os }}-${{ env.cache-name }}-${{ env.ESP_REV }}
+
+    - name: install ESP-IDF toolchain & pip dependencies
+      run: |
+        export IDF_PATH=$(pwd)/esp32/esp-idf
+        $IDF_PATH/install.sh
+        source $IDF_PATH/export.sh
+        python3 -m pip install --upgrade pip
+        pip3 install -r pytorch/requirements.txt
+
+    - name: make
+      run: |
+        export IDF_PATH=$(pwd)/esp32/esp-idf
+        source $IDF_PATH/export.sh
+        LIBTORCH=local_esp OP_SELECTION_YAML=tools/dev.yaml make
+
+    - name: upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: platform-esp.libtorch-lite.ops-dev.firmware.bin
+        path: build/firmware.bin
