@@ -33,8 +33,18 @@ BUILD_ESP = 0
 endif
 
 CP = cp
+
+ifeq ($(origin CC),default)
+CC = $(PREFIX)gcc
+endif
+
+ifeq ($(origin CXX),default)
 CXX = $(PREFIX)g++
+endif
+
+ifeq ($(origin AR),default)
 AR = $(PREFIX)ar
+endif
 
 ###############################################################################
 # Compiler Flags
@@ -42,6 +52,7 @@ AR = $(PREFIX)ar
 CPPFLAGS = \
 	-std=c++14 \
 	-Os \
+	-fPIC \
 	-ffunction-sections -fdata-sections -fvisibility=hidden -fvisibility-inlines-hidden \
 	-Wall -Werror \
 	-D_GLIBCXX_USE_CXX11_ABI=$(CXX11_ABI) \
@@ -235,12 +246,12 @@ else ifeq ($(UNAME), Darwin)
 endif
 
 $(BUILD_ROOT)/local/libtorch:
-	scripts/build_pytorch.sh
+	CC=$(CC) CXX=$(CXX) scripts/build_pytorch.sh
 	mkdir -p $(BUILD_ROOT)/local
 	ln -s $(PYTORCH_ROOT)/torch $(LIBTORCH_DIR)
 
 $(BUILD_ROOT)/local_lite/libtorch:
-	scripts/build_pytorch_lite.sh
+	CC=$(CC) CXX=$(CXX) scripts/build_pytorch_lite.sh
 	mkdir -p $(BUILD_ROOT)/local_lite
 	ln -s $(PYTORCH_ROOT)/build_pytorch_lite/install $(LIBTORCH_DIR)
 
