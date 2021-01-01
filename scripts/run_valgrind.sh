@@ -53,6 +53,8 @@ cmd_benchmark() {
 }
 
 show_header() {
+  printf '=%.0s' {1..120}
+  echo
   printf "%-65s%15s%15s%15s\n" "Run ID" "2N Insts #" "N Insts #" "Avg Insts #"
 }
 

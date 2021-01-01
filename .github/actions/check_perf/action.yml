@@ -22,3 +22,13 @@ runs:
         fi
         scripts/run_valgrind.sh run_simple_add
       shell: bash
+
+    - name: run walltime
+      run: |
+        if [ -z "${{ inputs.binary }}" ]; then
+          export BIN=$(pwd)/build/upytorch
+        else
+          export BIN="${{ inputs.binary }}"
+        fi
+        scripts/run_benchmark.sh
+      shell: bash
