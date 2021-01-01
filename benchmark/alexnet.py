@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from .common import *
+from common import *
 
 
 class AlexNet(nn.Module):

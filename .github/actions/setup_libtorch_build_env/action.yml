@@ -1,0 +1,9 @@
+name: setup libtorch build env
+runs:
+  using: "composite"
+  steps:
+    - name: install pip dependency
+      run: |
+        python3 -m pip install --upgrade pip
+        pip install -r pytorch/requirements.txt
+      shell: bash

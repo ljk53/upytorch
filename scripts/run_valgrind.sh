@@ -7,6 +7,9 @@ PYTORCH_ROOT=$ROOT/pytorch
 export MICROPYPATH=$ROOT
 OUT_DIR=$ROOT/valgrind_result
 
+NAME=${NAME:-upy}
+BIN=${BIN:-$ROOT/build/upytorch}
+
 mkdir -p $OUT_DIR
 
 cd "$ROOT/benchmark"
@@ -49,6 +52,10 @@ cmd_benchmark() {
   echo "import $module; $module.$func()($count)"
 }
 
+show_header() {
+  printf "%-65s%15s%15s%15s\n" "Run ID" "Total Insts #" "Base Insts #" "Avg Insts #"
+}
+
 run_benchmark() {
   local name=$1
   local runner=$2
@@ -60,13 +67,14 @@ run_benchmark() {
   $(cmd_valgrind $runid) $runner -c "$(cmd_benchmark $module $func $(( $count + 1)))"
   local total=$(cmd_total_insts $runid)
   local base=$(cmd_total_insts $runid.base)
-  printf "%-50s%15d%15d%15d\n" $runid $total $base $(( ($total - $base) / $count ))
+  printf "%-65s%15d%15d%15d\n" $runid $total $base $(( ($total - $base) / $count ))
 }
 
-run_benchmark upy $ROOT/build/upytorch simple_add add_s1_nograd_outplace 1000
-run_benchmark upy $ROOT/build/upytorch simple_add add_s1_nograd_outplace 5000
-run_benchmark upy $ROOT/build/upytorch simple_add add_s1_nograd_outplace 10000
+run_simple_add() {
+  show_header
+  run_benchmark $NAME $BIN simple_add add_s1_nograd_outplace 1000
+  run_benchmark $NAME $BIN simple_add add_s1_nograd_outplace 5000
+  run_benchmark $NAME $BIN simple_add add_s1_nograd_outplace 10000
+}
 
-run_benchmark py3 python3 simple_add add_s1_nograd_outplace 1000
-run_benchmark py3 python3 simple_add add_s1_nograd_outplace 5000
-run_benchmark py3 python3 simple_add add_s1_nograd_outplace 10000
+$@
