@@ -2,6 +2,8 @@ name: check framework overhead
 inputs:
   name:
     required: true
+  binary:
+    required: false
 runs:
   using: "composite"
   steps:
@@ -13,6 +15,10 @@ runs:
     - name: run valgrind
       run: |
         export NAME=${{ inputs.name }}
-        export BIN=$(pwd)/build/upytorch
+        if [ -z "${{ inputs.binary }}" ]; then
+          export BIN=$(pwd)/build/upytorch
+        else
+          export BIN="${{ inputs.binary }}"
+        fi
         scripts/run_valgrind.sh run_simple_add
       shell: bash

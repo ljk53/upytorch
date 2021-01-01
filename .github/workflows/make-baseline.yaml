@@ -1,0 +1,78 @@
+name: PyTorch Baseline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  # workflow_dispatch:
+  #   inputs:
+  #     git-ref:
+  #       description: PyTorch Git Ref (Optional)
+  #       required: false
+
+jobs:
+###############################################################################
+#
+#                     dynamically linked prebuilt libtorch
+#
+###############################################################################
+
+  baseline_platform-ubuntu_libtorch-prebuilt:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: setup python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+
+    - name: install prebuilt pytorch
+      run: |
+        pip install torch==1.7.1+cpu torchvision==0.8.2+cpu torchaudio==0.7.2 -f https://download.pytorch.org/whl/torch_stable.html
+
+    - name: check py3 perf (prebuilt libtorch)
+      uses: ./.github/actions/check_perf
+      with:
+        name: py3.prebuilt
+        binary: python3
+
+###############################################################################
+#
+#                     dynamically linked local libtorch
+#
+###############################################################################
+
+  baseline_platform-ubuntu_libtorch-local_ops-dev:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: checkout submodules
+      run: git submodule update --init --recursive micropython pytorch
+
+    - name: setup python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+
+    - uses: ./.github/actions/setup_libtorch_build_env
+
+    - name: make
+      run: LIBTORCH=local make
+
+    - name: check py3 perf (local libtorch)
+      uses: ./.github/actions/check_perf
+      with:
+        name: py3.local
+        binary: python3
+
+    - name: check upy perf (local libtorch)
+      uses: ./.github/actions/check_perf
+      with:
+        name: upy.local
