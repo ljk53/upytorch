@@ -92,7 +92,7 @@ jobs:
         name: py3.local
         binary: python3
 
-    - name: check upy perf (local libtorch)
-      uses: ./.github/actions/check_perf
-      with:
-        name: upy.local
+    # - name: check upy perf (local libtorch)
+    #   uses: ./.github/actions/check_perf
+    #   with:
+    #     name: upy.local

@@ -9,7 +9,18 @@ runs:
   steps:
     - name: install valgrind
       run: |
-        sudo apt-get update && sudo apt-get install -y valgrind
+        sudo apt-get update -y > apt.log.txt 2> apt.err.txt || (cat apt.log.txt && cat apt.err.txt)
+        sudo apt-get install valgrind -y > apt.log.txt 2> apt.err.txt || (cat apt.log.txt && cat apt.err.txt)
+      shell: bash
+
+    - name: run walltime
+      run: |
+        if [ -z "${{ inputs.binary }}" ]; then
+          export BIN=$(pwd)/build/upytorch
+        else
+          export BIN="${{ inputs.binary }}"
+        fi
+        scripts/run_benchmark.sh
       shell: bash
 
     - name: run valgrind
@@ -21,14 +32,4 @@ runs:
           export BIN="${{ inputs.binary }}"
         fi
         scripts/run_valgrind.sh run_simple_add
-      shell: bash
-
-    - name: run walltime
-      run: |
-        if [ -z "${{ inputs.binary }}" ]; then
-          export BIN=$(pwd)/build/upytorch
-        else
-          export BIN="${{ inputs.binary }}"
-        fi
-        scripts/run_benchmark.sh
       shell: bash
