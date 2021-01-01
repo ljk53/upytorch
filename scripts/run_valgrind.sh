@@ -20,11 +20,11 @@ cmd_valgrind() {
   --tool=callgrind
   --callgrind-out-file=$output
   --instr-atstart=yes
+  --dump-line=yes
+  --dump-instr=yes
+  --collect-jumps=yes
   --log-file=$output.log
   "
-#  --dump-line=yes
-#  --dump-instr=yes
-#  --collect-jumps=yes
 }
 
 cmd_callgrind() {
@@ -68,6 +68,7 @@ run_benchmark() {
   local total=$(cmd_total_insts $runid)
   local base=$(cmd_total_insts $runid.base)
   printf "%-65s%15d%15d%15d\n" $runid $total $base $(( ($total - $base) / $count ))
+  # $(cmd_callgrind $runid) > $OUT_DIR/callgrind.$runid.txt
 }
 
 run_simple_add() {
@@ -75,6 +76,14 @@ run_simple_add() {
   run_benchmark $NAME $BIN simple_add add_s1_nograd_outplace 1000
   run_benchmark $NAME $BIN simple_add add_s1_nograd_outplace 5000
   run_benchmark $NAME $BIN simple_add add_s1_nograd_outplace 10000
+
+  run_benchmark $NAME $BIN simple_add add_s1 1000
+  run_benchmark $NAME $BIN simple_add add_s1 5000
+  run_benchmark $NAME $BIN simple_add add_s1 10000
+
+  run_benchmark $NAME $BIN simple_add add_s1024 1000
+  run_benchmark $NAME $BIN simple_add add_s1024 5000
+  run_benchmark $NAME $BIN simple_add add_s1024 10000
 }
 
 $@
