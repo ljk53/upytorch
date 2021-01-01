@@ -1,0 +1,276 @@
+name: builds & tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+###############################################################################
+#
+#                     dynamically linked prebuilt libtorch
+#
+###############################################################################
+
+  test_platform-macos_libtorch-prebuilt_ops-dev:
+
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: checkout submodules
+      run: git submodule update --init --recursive micropython pytorch
+
+    - name: setup python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+
+    - uses: ./.github/actions/setup_libtorch_build_env
+
+    - name: make
+      run: LIBTORCH=prebuilt make
+
+    - name: test
+      run: LIBTORCH=prebuilt make test
+
+    - uses: ./.github/actions/check_binary_size
+
+    - name: upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: platform-macos.libtorch-prebuilt.ops-dev
+        path: build/upytorch.strip
+
+  test_platform-ubuntu_libtorch-prebuilt_ops-dev:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: checkout submodules
+      run: git submodule update --init --recursive micropython pytorch
+
+    - name: setup python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+
+    - uses: ./.github/actions/setup_libtorch_build_env
+
+    - name: make
+      run: LIBTORCH=prebuilt make
+
+    - name: test
+      run: LIBTORCH=prebuilt make test
+
+    - uses: ./.github/actions/check_binary_size
+
+    - uses: ./.github/actions/check_perf
+      with:
+        name: upy.prebuilt
+
+    - name: upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: platform-ubuntu.libtorch-prebuilt.ops-dev
+        path: build/upytorch.strip
+
+###############################################################################
+#
+#                     statically linked lite-libtorch
+#
+###############################################################################
+
+  build_platform-macos_libtorch-lite_ops-noop:
+
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: checkout submodules
+      run: git submodule update --init --recursive micropython pytorch
+
+    - name: setup python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+
+    - uses: ./.github/actions/setup_libtorch_build_env
+
+    - name: make
+      run: LIBTORCH=local_lite OP_SELECTION_YAML=tools/noop.yaml make
+
+    - uses: ./.github/actions/check_binary_size
+
+    - name: upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: platform-macos.libtorch-lite.ops-noop
+        path: build/upytorch.strip
+
+  build_platform-ubuntu_libtorch-lite_ops-noop:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: checkout submodules
+      run: git submodule update --init --recursive micropython pytorch
+
+    - name: setup python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+
+    - uses: ./.github/actions/setup_libtorch_build_env
+
+    - name: make
+      run: LIBTORCH=local_lite OP_SELECTION_YAML=tools/noop.yaml make
+
+    - uses: ./.github/actions/check_binary_size
+
+    - name: upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: platform-ubuntu.libtorch-lite.ops-noop
+        path: build/upytorch.strip
+
+  build_platform-macos_libtorch-lite_ops-alexnet:
+
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: checkout submodules
+      run: git submodule update --init --recursive micropython pytorch
+
+    - name: setup python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+
+    - uses: ./.github/actions/setup_libtorch_build_env
+
+    - name: make
+      run: LIBTORCH=local_lite OP_SELECTION_YAML=tools/alexnet.yaml make
+
+    - name: run AlexNet
+      run: |
+        export ROOT=`pwd`
+        export MICROPYPATH=$ROOT
+        export UPY=$ROOT/build/upytorch
+
+        cd benchmark
+        $UPY -c 'import alexnet; alexnet.alexnet()(1)'
+
+    - uses: ./.github/actions/check_binary_size
+
+    - name: upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: platform-macos.libtorch-lite.ops-alexnet
+        path: build/upytorch.strip
+
+  build_platform-ubuntu_libtorch-lite_ops-alexnet:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: checkout submodules
+      run: git submodule update --init --recursive micropython pytorch
+
+    - name: setup python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+
+    - uses: ./.github/actions/setup_libtorch_build_env
+
+    - name: make
+      run: LIBTORCH=local_lite OP_SELECTION_YAML=tools/alexnet.yaml make
+
+    - name: run AlexNet
+      run: |
+        export ROOT=`pwd`
+        export MICROPYPATH=$ROOT
+        export UPY=$ROOT/build/upytorch
+
+        cd benchmark
+        $UPY -c 'import alexnet; alexnet.alexnet()(1)'
+
+    - uses: ./.github/actions/check_binary_size
+
+    - name: upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: platform-ubuntu.libtorch-lite.ops-alexnet
+        path: build/upytorch.strip
+
+  build_platform-macos_libtorch-lite_ops-dev:
+
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: checkout submodules
+      run: git submodule update --init --recursive micropython pytorch
+
+    - name: setup python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+
+    - uses: ./.github/actions/setup_libtorch_build_env
+
+    - name: make
+      run: LIBTORCH=local_lite OP_SELECTION_YAML=tools/dev.yaml make
+
+    - uses: ./.github/actions/check_binary_size
+
+    - name: upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: platform-macos.libtorch-lite.ops-dev
+        path: build/upytorch.strip
+
+  build_platform-ubuntu_libtorch-lite_ops-dev:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: checkout submodules
+      run: git submodule update --init --recursive micropython pytorch
+
+    - name: setup python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+
+    - uses: ./.github/actions/setup_libtorch_build_env
+
+    - name: make
+      run: LIBTORCH=local_lite OP_SELECTION_YAML=tools/dev.yaml make
+
+    - uses: ./.github/actions/check_binary_size
+
+    - uses: ./.github/actions/check_perf
+      with:
+        name: upy.lite.dev
+
+    - name: upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: platform-ubuntu.libtorch-lite.ops-dev
+        path: build/upytorch.strip

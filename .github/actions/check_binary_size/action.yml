@@ -1,0 +1,13 @@
+name: check upytorch build size
+inputs:
+  name:
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: show binary size
+      run: |
+        strip build/upytorch -o build/upytorch.strip
+        tar zcvf build/upytorch.tar.gz build/upytorch.strip
+        ls -la build/upytorch*
+      shell: bash

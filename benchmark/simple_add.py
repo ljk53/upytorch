@@ -1,5 +1,5 @@
 import torch
-from .common import *
+from common import *
 
 
 def add_s1_nograd_outplace():
