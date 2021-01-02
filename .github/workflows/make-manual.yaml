@@ -56,11 +56,11 @@ jobs:
 
     - name: make & test
       run: |
-        export PATH="/usr/lib/ccache:$PATH"
-        ccache -s
-        echo "gcc -> $(which gcc)"
+        # export PATH="/usr/lib/ccache:$PATH"
+        # ccache -s
+        # echo "gcc -> $(which gcc)"
         LIBTORCH=local make test
-        ccache -s
+        # ccache -s
 
     - name: check python3 perf (dynamically linked with the locally built standard libtorch)
       uses: ./.github/actions/check_perf
