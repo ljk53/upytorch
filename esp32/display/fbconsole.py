@@ -23,7 +23,7 @@ class FBConsole(uio.IOBase):
                 raise ValueError
         self.bgcolor = bgcolor
         self.fgcolor = fgcolor
-        self.line_height(8)
+        self.char_size(6, 8)
         self.cls()
 
     def cls(self):
@@ -36,10 +36,11 @@ class FBConsole(uio.IOBase):
         except:
             pass
 
-    def line_height(self, px):
-        self.lineheight = px
-        self.w =  self.width // px
-        self.h =  self.height // px
+    def char_size(self, cw, ch):
+        self.cw = cw
+        self.ch = ch
+        self.w = self.width // cw
+        self.h = self.height // ch
 
     def _putc(self, c):
         c = chr(c)
@@ -48,8 +49,8 @@ class FBConsole(uio.IOBase):
         elif c == '\x08':
             self._backspace()
         elif c >= ' ':
-            self.fb.fill_rect(self.x * 8, self.y * self.lineheight, 8, self.lineheight, self.bgcolor)
-            self.fb.text(c, self.x * 8, self.y * self.lineheight, self.fgcolor)
+            self.fb.fill_rect(self.x * self.cw, self.y * self.ch, self.cw, self.ch, self.bgcolor)
+            self.fb.text(c, self.x * self.cw, self.y * self.ch, self.fgcolor)
             self.x += 1
             if self.x >= self.w:
                 self._newline()
@@ -99,8 +100,8 @@ class FBConsole(uio.IOBase):
         self.x = 0
         self.y += 1
         if self.y >= self.h:
-            self.fb.scroll(0, -8)
-            self.fb.fill_rect(0, self.height - self.lineheight, self.width, self.lineheight, self.bgcolor)
+            self.fb.scroll(0, -self.ch)
+            self.fb.fill_rect(0, self.height - self.ch, self.width, self.ch, self.bgcolor)
             self.y = self.h - 1
         self.y_end = self.y
 
@@ -113,10 +114,10 @@ class FBConsole(uio.IOBase):
             self.x -= 1
 
     def _clear_cursor_eol(self):
-        self.fb.fill_rect(self.x * 8, self.y * self.lineheight, self.width, self.lineheight, self.bgcolor)
+        self.fb.fill_rect(self.x * self.cw, self.y * self.ch, self.width, self.ch, self.bgcolor)
         for l in range(self.y + 1, self.y_end + 1):
-            self.fb.fill_rect(0, l * self.lineheight, self.width, self.lineheight, self.bgcolor)
+            self.fb.fill_rect(0, l * self.ch, self.width, self.ch, self.bgcolor)
         self.y_end = self.y
 
     def _draw_cursor(self, color):
-        self.fb.hline(self.x * 8, self.y * self.lineheight + 7, 8, color)
+        self.fb.hline(self.x * self.cw, self.y * self.ch + self.ch - 1, self.cw, color)
