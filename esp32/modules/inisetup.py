@@ -44,6 +44,9 @@ def setup():
 #esp.osdebug(None)
 #import webrepl
 #webrepl.start()
+
+from display import display
+display.init()
 """
         )
     return vfs
