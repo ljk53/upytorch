@@ -4,6 +4,10 @@
 set -eux -o pipefail
 
 ROOT="$( cd "$(dirname "$0")" ; pwd -P)/.."
+OUT_DIR=$ROOT/bloaty_result
+
+mkdir -p $OUT_DIR
+
 UNAME=$(uname -s)
 
 cd "$ROOT"
@@ -15,14 +19,28 @@ strip build/upytorch -o build/upytorch.strip
 if [ "$UNAME" == "Linux" ]; then
 
 bloaty \
+  -d sections,compileunits \
+  -n 0 \
+  --debug-file build/upytorch \
+  build/upytorch.strip > $OUT_DIR/bloaty_units.txt
+
+bloaty \
+  --csv \
+  --demangle full \
   -d sections,compileunits,symbols \
   -n 0 \
   --debug-file build/upytorch \
-  build/upytorch.strip | tee bloaty_output.txt
+  build/upytorch.strip > $OUT_DIR/bloaty_full.txt
 
 elif [ "$UNAME" == "Darwin" ]; then
 
 dsymutil build/upytorch
+
+bloaty \
+  -d sections,compileunits \
+  -n 0 \
+  --debug-file build/upytorch.dSYM/Contents/Resources/DWARF/upytorch \
+  build/upytorch.strip > $OUT_DIR/bloaty_units.txt
 
 bloaty \
   --csv \
@@ -30,6 +48,6 @@ bloaty \
   -d sections,compileunits,symbols \
   -n 0 \
   --debug-file build/upytorch.dSYM/Contents/Resources/DWARF/upytorch \
-  build/upytorch.strip | tee bloaty_output.txt
+  build/upytorch.strip > $OUT_DIR/bloaty_full.txt
 
 fi

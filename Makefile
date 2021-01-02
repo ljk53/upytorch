@@ -50,6 +50,10 @@ UNAME ?= $(shell uname)
 ###############################################################################
 # Compiler Flags
 
+ifeq ($(DEBUG), 1)
+CPPFLAGS += -g
+endif
+
 CPPFLAGS = \
 	-std=c++14 \
 	-Os \
@@ -94,10 +98,6 @@ CPPFLAGS += \
 
 endif  # $(LIBTORCH)
 
-ifeq ($(DEBUG), 1)
-CPPFLAGS += -g
-endif
-
 ###############################################################################
 # MicroPython Build Flags
 
@@ -116,7 +116,7 @@ ifneq ($(UNAME), Darwin)
 UPYFLAGS += MICROPY_USE_READLINE=0
 endif
 
-CFLAGS_EXTRA = -DMODULE_TORCH_ENABLED=1
+CFLAGS_EXTRA = -Os -DMODULE_TORCH_ENABLED=1
 
 ifneq ($(BUILD_ESP), 1)
 CFLAGS_EXTRA += -DMICROPY_MODULE_BUILTIN_INIT=1

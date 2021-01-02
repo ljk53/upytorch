@@ -10,6 +10,9 @@ jobs:
   build_platform-esp_libtorch-lite_ops-dev:
 
     runs-on: ubuntu-latest
+    env:
+      LIBTORCH: local_esp
+      OP_SELECTION_YAML: tools/dev.yaml
 
     steps:
     - uses: actions/checkout@v2
@@ -44,7 +47,7 @@ jobs:
       run: |
         export IDF_PATH=$(pwd)/esp32/esp-idf
         source $IDF_PATH/export.sh
-        LIBTORCH=local_esp OP_SELECTION_YAML=tools/dev.yaml make
+        make
 
     - name: upload artifact
       uses: actions/upload-artifact@v2
