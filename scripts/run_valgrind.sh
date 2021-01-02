@@ -20,11 +20,11 @@ cmd_valgrind() {
   --tool=callgrind
   --callgrind-out-file=$output
   --instr-atstart=yes
-  --dump-line=yes
-  --dump-instr=yes
-  --collect-jumps=yes
   --log-file=$output.log
   "
+#   --dump-line=yes
+#   --dump-instr=yes
+#   --collect-jumps=yes
 }
 
 cmd_callgrind() {
