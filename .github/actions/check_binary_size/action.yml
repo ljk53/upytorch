@@ -11,3 +11,15 @@ runs:
         tar zcvf build/upytorch.tar.gz build/upytorch.strip
         ls -la build/upytorch*
       shell: bash
+
+    - name: run bloaty
+      run: |
+        UNAME=$(uname -s)
+        if [ "$UNAME" != "Darwin" ]; then
+          exit 0
+        fi
+        brew install bloaty >brew.log 2>brew.err || (cat brew.log && cat brew.err)
+        make clean
+        scripts/run_bloaty.sh >bloaty.log 2>bloaty.err || (cat bloaty.log && cat bloaty.err)
+        cat bloaty_result/bloaty_units.txt
+      shell: bash

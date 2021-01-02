@@ -17,6 +17,10 @@ jobs:
   platform-macos_libtorch-prebuilt_ops-dev:
 
     runs-on: macos-latest
+    env:
+      NAME: platform-macos.libtorch-prebuilt.ops-dev
+      LIBTORCH: prebuilt
+      OP_SELECTION_YAML: tools/dev.yaml
 
     steps:
     - uses: actions/checkout@v2
@@ -31,23 +35,31 @@ jobs:
 
     - uses: ./.github/actions/setup_libtorch_build_env
 
-    - name: make
-      run: LIBTORCH=prebuilt make
-
-    - name: test
-      run: LIBTORCH=prebuilt make test
+    - name: make & test
+      run: make test
 
     - uses: ./.github/actions/check_binary_size
 
     - name: upload artifact
       uses: actions/upload-artifact@v2
       with:
-        name: platform-macos.libtorch-prebuilt.ops-dev
+        name: ${{ env.NAME }}
         path: build/upytorch.strip
+
+    - name: upload bloaty
+      uses: actions/upload-artifact@v2
+      with:
+        name: bloaty-${{ env.NAME }}
+        path: bloaty_result
+        if-no-files-found: ignore
 
   platform-ubuntu_libtorch-prebuilt_ops-dev:
 
     runs-on: ubuntu-latest
+    env:
+      NAME: platform-ubuntu.libtorch-prebuilt.ops-dev
+      LIBTORCH: prebuilt
+      OP_SELECTION_YAML: tools/dev.yaml
 
     steps:
     - uses: actions/checkout@v2
@@ -66,11 +78,8 @@ jobs:
       run: |
         pip install torch==1.7.1+cpu torchvision==0.8.2+cpu torchaudio==0.7.2 -f https://download.pytorch.org/whl/torch_stable.html
 
-    - name: make
-      run: LIBTORCH=prebuilt make
-
-    - name: test
-      run: LIBTORCH=prebuilt make test
+    - name: make & test
+      run: make test
 
     - uses: ./.github/actions/check_binary_size
 
@@ -88,8 +97,15 @@ jobs:
     - name: upload artifact
       uses: actions/upload-artifact@v2
       with:
-        name: platform-ubuntu.libtorch-prebuilt.ops-dev
+        name: ${{ env.NAME }}
         path: build/upytorch.strip
+
+    - name: upload bloaty
+      uses: actions/upload-artifact@v2
+      with:
+        name: bloaty-${{ env.NAME }}
+        path: bloaty_result
+        if-no-files-found: ignore
 
 ###############################################################################
 #
@@ -100,6 +116,10 @@ jobs:
   platform-macos_libtorch-lite_ops-noop:
 
     runs-on: macos-latest
+    env:
+      NAME: platform-macos.libtorch-lite.ops-noop
+      LIBTORCH: local_lite
+      OP_SELECTION_YAML: tools/noop.yaml
 
     steps:
     - uses: actions/checkout@v2
@@ -115,19 +135,30 @@ jobs:
     - uses: ./.github/actions/setup_libtorch_build_env
 
     - name: make
-      run: LIBTORCH=local_lite OP_SELECTION_YAML=tools/noop.yaml make
+      run: make
 
     - uses: ./.github/actions/check_binary_size
 
     - name: upload artifact
       uses: actions/upload-artifact@v2
       with:
-        name: platform-macos.libtorch-lite.ops-noop
+        name: ${{ env.NAME }}
         path: build/upytorch.strip
+
+    - name: upload bloaty
+      uses: actions/upload-artifact@v2
+      with:
+        name: bloaty-${{ env.NAME }}
+        path: bloaty_result
+        if-no-files-found: ignore
 
   platform-ubuntu_libtorch-lite_ops-noop:
 
     runs-on: ubuntu-latest
+    env:
+      NAME: platform-ubuntu.libtorch-lite.ops-noop
+      LIBTORCH: local_lite
+      OP_SELECTION_YAML: tools/noop.yaml
 
     steps:
     - uses: actions/checkout@v2
@@ -143,19 +174,30 @@ jobs:
     - uses: ./.github/actions/setup_libtorch_build_env
 
     - name: make
-      run: LIBTORCH=local_lite OP_SELECTION_YAML=tools/noop.yaml make
+      run: make
 
     - uses: ./.github/actions/check_binary_size
 
     - name: upload artifact
       uses: actions/upload-artifact@v2
       with:
-        name: platform-ubuntu.libtorch-lite.ops-noop
+        name: ${{ env.NAME }}
         path: build/upytorch.strip
+
+    - name: upload bloaty
+      uses: actions/upload-artifact@v2
+      with:
+        name: bloaty-${{ env.NAME }}
+        path: bloaty_result
+        if-no-files-found: ignore
 
   platform-macos_libtorch-lite_ops-alexnet:
 
     runs-on: macos-latest
+    env:
+      NAME: platform-macos.libtorch-lite.ops-alexnet
+      LIBTORCH: local_lite
+      OP_SELECTION_YAML: tools/alexnet.yaml
 
     steps:
     - uses: actions/checkout@v2
@@ -171,7 +213,7 @@ jobs:
     - uses: ./.github/actions/setup_libtorch_build_env
 
     - name: make
-      run: LIBTORCH=local_lite OP_SELECTION_YAML=tools/alexnet.yaml make
+      run: make
 
     - name: run AlexNet
       run: |
@@ -187,12 +229,23 @@ jobs:
     - name: upload artifact
       uses: actions/upload-artifact@v2
       with:
-        name: platform-macos.libtorch-lite.ops-alexnet
+        name: ${{ env.NAME }}
         path: build/upytorch.strip
+
+    - name: upload bloaty
+      uses: actions/upload-artifact@v2
+      with:
+        name: bloaty-${{ env.NAME }}
+        path: bloaty_result
+        if-no-files-found: ignore
 
   platform-ubuntu_libtorch-lite_ops-alexnet:
 
     runs-on: ubuntu-latest
+    env:
+      NAME: platform-ubuntu.libtorch-lite.ops-alexnet
+      LIBTORCH: local_lite
+      OP_SELECTION_YAML: tools/alexnet.yaml
 
     steps:
     - uses: actions/checkout@v2
@@ -208,7 +261,7 @@ jobs:
     - uses: ./.github/actions/setup_libtorch_build_env
 
     - name: make
-      run: LIBTORCH=local_lite OP_SELECTION_YAML=tools/alexnet.yaml make
+      run: make
 
     - name: run AlexNet
       run: |
@@ -224,12 +277,23 @@ jobs:
     - name: upload artifact
       uses: actions/upload-artifact@v2
       with:
-        name: platform-ubuntu.libtorch-lite.ops-alexnet
+        name: ${{ env.NAME }}
         path: build/upytorch.strip
+
+    - name: upload bloaty
+      uses: actions/upload-artifact@v2
+      with:
+        name: bloaty-${{ env.NAME }}
+        path: bloaty_result
+        if-no-files-found: ignore
 
   platform-macos_libtorch-lite_ops-dev:
 
     runs-on: macos-latest
+    env:
+      NAME: platform-macos.libtorch-lite.ops-dev
+      LIBTORCH: local_lite
+      OP_SELECTION_YAML: tools/dev.yaml
 
     steps:
     - uses: actions/checkout@v2
@@ -245,19 +309,30 @@ jobs:
     - uses: ./.github/actions/setup_libtorch_build_env
 
     - name: make
-      run: LIBTORCH=local_lite OP_SELECTION_YAML=tools/dev.yaml make
+      run: make
 
     - uses: ./.github/actions/check_binary_size
 
     - name: upload artifact
       uses: actions/upload-artifact@v2
       with:
-        name: platform-macos.libtorch-lite.ops-dev
+        name: ${{ env.NAME }}
         path: build/upytorch.strip
+
+    - name: upload bloaty
+      uses: actions/upload-artifact@v2
+      with:
+        name: bloaty-${{ env.NAME }}
+        path: bloaty_result
+        if-no-files-found: ignore
 
   platform-ubuntu_libtorch-lite_ops-dev:
 
     runs-on: ubuntu-latest
+    env:
+      NAME: platform-ubuntu.libtorch-lite.ops-dev
+      LIBTORCH: local_lite
+      OP_SELECTION_YAML: tools/dev.yaml
 
     steps:
     - uses: actions/checkout@v2
@@ -273,7 +348,7 @@ jobs:
     - uses: ./.github/actions/setup_libtorch_build_env
 
     - name: make
-      run: LIBTORCH=local_lite OP_SELECTION_YAML=tools/dev.yaml make
+      run: make
 
     - uses: ./.github/actions/check_binary_size
 
@@ -285,5 +360,12 @@ jobs:
     - name: upload artifact
       uses: actions/upload-artifact@v2
       with:
-        name: platform-ubuntu.libtorch-lite.ops-dev
+        name: ${{ env.NAME }}
         path: build/upytorch.strip
+
+    - name: upload bloaty
+      uses: actions/upload-artifact@v2
+      with:
+        name: bloaty-${{ env.NAME }}
+        path: bloaty_result
+        if-no-files-found: ignore
