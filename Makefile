@@ -6,19 +6,18 @@
 
 LIBTORCH ?= local
 
-UNAME := $(shell uname)
-PYTORCH_ROOT ?= $(CURDIR)/pytorch
-CXX11_ABI ?= 1
+SRC_ROOT ?= $(CURDIR)
+BUILD_ROOT ?= $(SRC_ROOT)/build
+PYTORCH_ROOT ?= $(SRC_ROOT)/pytorch
 
-UPY_DIR ?= $(CURDIR)/micropython
+include $(SRC_ROOT)/libtorch.mk
+
+UPY_DIR ?= $(SRC_ROOT)/micropython
 UPY_PORT_DIR ?= $(UPY_DIR)/ports/unix
 VARIANT ?= standard
 
-BUILD_ROOT ?= $(CURDIR)/build
-LIBTORCH_DIR = $(BUILD_ROOT)/$(LIBTORCH)/libtorch
-
 PROG ?= $(BUILD_ROOT)/upytorch
-OP_SELECTION_YAML ?= $(CURDIR)/tools/dev.yaml
+OP_SELECTION_YAML ?= $(SRC_ROOT)/tools/dev.yaml
 
 ifeq ($(LIBTORCH), local_lite)
 BUILD_LITE = 1
@@ -46,6 +45,8 @@ ifeq ($(origin AR),default)
 AR = $(PREFIX)ar
 endif
 
+UNAME ?= $(shell uname)
+
 ###############################################################################
 # Compiler Flags
 
@@ -55,19 +56,16 @@ CPPFLAGS = \
 	-fPIC \
 	-ffunction-sections -fdata-sections -fvisibility=hidden -fvisibility-inlines-hidden \
 	-Wall -Werror \
-	-D_GLIBCXX_USE_CXX11_ABI=$(CXX11_ABI) \
 	-I $(UPY_DIR) \
 	-I $(UPY_DIR)/py \
-	-I $(LIBTORCH_DIR)/include \
-	-I $(LIBTORCH_DIR)/include/torch/csrc/api/include \
 	-I wrapper \
 	-I $(BUILD_ROOT)
 
 ifeq ($(LIBTORCH), local_esp)
 
 # Override the micropython port dir to our local fork!
-UPY_PORT_DIR = $(CURDIR)/esp32
-ESPCOMP = $(CURDIR)/esp32/esp-idf/components
+UPY_PORT_DIR = $(SRC_ROOT)/esp32
+ESPCOMP = $(SRC_ROOT)/esp32/esp-idf/components
 
 CPPFLAGS += \
 	-DESP_PLATFORM \
@@ -101,58 +99,6 @@ CPPFLAGS += -g
 endif
 
 ###############################################################################
-# LibTorch Linker Flags
-
-ifeq ($(LIBTORCH), local_lite)
-
-ifeq ($(UNAME), Linux)
-LIBTORCH_LDFLAGS = \
-	-L $(LIBTORCH_DIR)/../lib \
-	-Wl,--gc-sections \
-	-Wl,--whole-archive \
-	-lc10 -ltorch -ltorch_cpu \
-	-Wl,--no-whole-archive \
-	-lpthreadpool \
-	-lcpuinfo -lclog -lpthread -ldl -lstdc++
-	# -lnnpack -lXNNPACK -lpytorch_qnnpack -leigen_blas
-
-ifeq ($(WHY_LIVE), 1)
-LIBTORCH_LDFLAGS += -Wl,-Map=$(BUILD_ROOT)/output.map -Wl,--cref -Wl,--print-gc-sections
-endif
-
-else ifeq ($(UNAME), Darwin)
-LIBTORCH_LDFLAGS = \
-	-L $(LIBTORCH_DIR)/../lib \
-	-Wl,-dead_strip \
-	-Wl,-all_load \
-	-lc10 -ltorch -ltorch_cpu \
-	-lpthreadpool \
-	-lcpuinfo -lclog -lpthread -ldl -lstdc++
-
-ifeq ($(WHY_LIVE), 1)
-LIBTORCH_LDFLAGS += -Wl,-why_live,*
-endif
-
-endif  # $(UNAME) Linux/Darwin
-
-else ifeq ($(LIBTORCH), local_esp)
-LIBTORCH_LDFLAGS = \
-	-L $(LIBTORCH_DIR)/../lib \
-	--gc-sections \
-	--whole-archive \
-	-lc10 -ltorch -ltorch_cpu \
-	--no-whole-archive
-
-else
-LIBTORCH_LDFLAGS = \
-	-L $(LIBTORCH_DIR)/lib \
-	-Wl,-rpath,$(LIBTORCH_DIR)/lib \
-	-lc10 -ltorch -ltorch_cpu \
-	-lstdc++
-
-endif  # $(LIBTORCH) local_lite/local_esp
-
-###############################################################################
 # MicroPython Build Flags
 
 UPYFLAGS = \
@@ -178,7 +124,7 @@ endif
 
 UPYFLAGSS = \
 	$(UPYFLAGS) \
-	USER_C_MODULES=$(CURDIR) \
+	USER_C_MODULES=$(SRC_ROOT) \
 	CFLAGS_EXTRA="$(CFLAGS_EXTRA)" \
 	LDFLAGS_EXTRA="$(LIBTORCH_LDFLAGS)"
 
@@ -207,24 +153,25 @@ OBJS = $(patsubst %.cpp,%.o,$(filter %.cpp,$(SRCS)))
 ###############################################################################
 # Main Targets
 
-all: $(PROG)
+.PHONY: all test clean
+.DEFAULT_GOAL := all
 
-.PHONY: test clean
+all: $(PROG)
 
 $(PROG): wrapper/libwrapper.a
 	$(MAKEUPYCROSS)
 	$(MAKEUPY) $(UPYFLAGSS) all
 
 test: $(PROG)
-	MICROPYPATH=$(CURDIR) \
+	MICROPYPATH=$(SRC_ROOT) \
 	MICROPY_MICROPYTHON=$(PROG) \
-	python3 $(UPY_DIR)/tests/run-tests --keep-path -d $(CURDIR)/tests || \
-	python3 $(UPY_DIR)/tests/run-tests --keep-path -d $(CURDIR)/tests --print-failures
+	python3 $(UPY_DIR)/tests/run-tests --keep-path -d $(SRC_ROOT)/tests || \
+	python3 $(UPY_DIR)/tests/run-tests --keep-path -d $(SRC_ROOT)/tests --print-failures
 
 # Build standard micropython binary to run 'upip'.
 upy:
 	make -C $(UPY_DIR)/mpy-cross
-	make -C $(UPY_PORT_DIR) BUILD=$(BUILD_ROOT) PROG=$(CURDIR)/upy
+	make -C $(UPY_PORT_DIR) BUILD=$(BUILD_ROOT) PROG=$(SRC_ROOT)/upy
 
 clean:
 	$(MAKEUPY) clean
@@ -232,34 +179,6 @@ clean:
 	rm -rf wrapper/generated
 	rm -f wrapper/*.o wrapper/*.a wrapper/*.so
 	rm -f upy upy.map
-
-###############################################################################
-# LibTorch Variants - providing $(LIBTORCH_DIR)
-
-$(BUILD_ROOT)/prebuilt/libtorch:
-	mkdir -p $(BUILD_ROOT)
-ifeq ($(UNAME), Linux)
-	cd $(BUILD_ROOT) && curl -LsO 'https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-1.7.1%2Bcpu.zip'
-	cd $(BUILD_ROOT) && unzip -qq -o libtorch-cxx11-abi-shared-with-deps-1.7.1%2Bcpu.zip -d prebuilt
-else ifeq ($(UNAME), Darwin)
-	cd $(BUILD_ROOT) && curl -LsO 'https://download.pytorch.org/libtorch/cpu/libtorch-macos-1.7.1.zip'
-	cd $(BUILD_ROOT) && unzip -qq -o libtorch-macos-1.7.1.zip -d prebuilt
-endif
-
-$(BUILD_ROOT)/local/libtorch:
-	CC=$(CC) CXX=$(CXX) scripts/build_pytorch.sh
-	mkdir -p $(BUILD_ROOT)/local
-	ln -s $(PYTORCH_ROOT)/torch $(LIBTORCH_DIR)
-
-$(BUILD_ROOT)/local_lite/libtorch:
-	CC=$(CC) CXX=$(CXX) scripts/build_pytorch_lite.sh
-	mkdir -p $(BUILD_ROOT)/local_lite
-	ln -s $(PYTORCH_ROOT)/build_pytorch_lite/install $(LIBTORCH_DIR)
-
-$(BUILD_ROOT)/local_esp/libtorch:
-	scripts/build_pytorch_esp32.sh
-	mkdir -p $(BUILD_ROOT)/local_esp
-	ln -s $(PYTORCH_ROOT)/build_pytorch_esp32/install $(LIBTORCH_DIR)
 
 ###############################################################################
 # Binding Codegen
@@ -289,7 +208,7 @@ endif
 # Build
 
 %.o: %.cpp $(LIBTORCH_DIR) $(GENERATED_HEADERS) wrapper/*.h
-	$(CXX) $(CPPFLAGS) -c $< -o $@
+	$(CXX) $(CPPFLAGS) $(LIBTORCH_CPPFLAGS) -c $< -o $@
 
 wrapper/libwrapper.a: $(OBJS)
 	$(AR) rcs wrapper/libwrapper.a $(OBJS)

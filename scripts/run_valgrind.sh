@@ -20,11 +20,11 @@ cmd_valgrind() {
   --tool=callgrind
   --callgrind-out-file=$output
   --instr-atstart=yes
-  --dump-line=yes
-  --dump-instr=yes
-  --collect-jumps=yes
   --log-file=$output.log
   "
+#   --dump-line=yes
+#   --dump-instr=yes
+#   --collect-jumps=yes
 }
 
 cmd_callgrind() {
@@ -53,7 +53,9 @@ cmd_benchmark() {
 }
 
 show_header() {
-  printf "%-65s%15s%15s%15s\n" "Run ID" "Total Insts #" "Base Insts #" "Avg Insts #"
+  printf '=%.0s' {1..120}
+  echo
+  printf "%-65s%15s%15s%15s\n" "Run ID" "2N Insts #" "N Insts #" "Avg Insts #"
 }
 
 run_benchmark() {
@@ -62,28 +64,28 @@ run_benchmark() {
   local module=$3
   local func=$4
   local count=$5
-  local runid=$name.$module.$func.$count
-  $(cmd_valgrind $runid.base) $runner -c "$(cmd_benchmark $module $func 1)"
-  $(cmd_valgrind $runid) $runner -c "$(cmd_benchmark $module $func $(( $count + 1)))"
-  local total=$(cmd_total_insts $runid)
-  local base=$(cmd_total_insts $runid.base)
-  printf "%-65s%15d%15d%15d\n" $runid $total $base $(( ($total - $base) / $count ))
-  # $(cmd_callgrind $runid) > $OUT_DIR/callgrind.$runid.txt
+  local runid="$name.$module.$func.N$count"
+
+  $(cmd_valgrind $runid.n) $runner -c "$(cmd_benchmark $module $func $count)"
+  local once=$(cmd_total_insts $runid.n)
+
+  $(cmd_valgrind $runid.2n) $runner -c "$(cmd_benchmark $module $func $(( $count + $count )))"
+  local twice=$(cmd_total_insts $runid.2n)
+
+  printf "%-65s%15d%15d%15d\n" $runid $twice $once $(( ($twice - $once) / $count ))
+  # $(cmd_callgrind $runid.n) > $OUT_DIR/callgrind.$runid.txt
 }
 
 run_simple_add() {
   show_header
-  run_benchmark $NAME $BIN simple_add add_s1_nograd_outplace 1000
+  run_benchmark $NAME $BIN simple_add add_s1_nograd_outplace 500
   run_benchmark $NAME $BIN simple_add add_s1_nograd_outplace 5000
-  run_benchmark $NAME $BIN simple_add add_s1_nograd_outplace 10000
 
-  run_benchmark $NAME $BIN simple_add add_s1 1000
+  run_benchmark $NAME $BIN simple_add add_s1 500
   run_benchmark $NAME $BIN simple_add add_s1 5000
-  run_benchmark $NAME $BIN simple_add add_s1 10000
 
-  run_benchmark $NAME $BIN simple_add add_s1024 1000
+  run_benchmark $NAME $BIN simple_add add_s1024 500
   run_benchmark $NAME $BIN simple_add add_s1024 5000
-  run_benchmark $NAME $BIN simple_add add_s1024 10000
 }
 
 $@
