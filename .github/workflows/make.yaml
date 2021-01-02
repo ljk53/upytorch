@@ -7,13 +7,14 @@ on:
     branches: [ main ]
 
 jobs:
+
 ###############################################################################
 #
 #                     dynamically linked prebuilt libtorch
 #
 ###############################################################################
 
-  test_platform-macos_libtorch-prebuilt_ops-dev:
+  platform-macos_libtorch-prebuilt_ops-dev:
 
     runs-on: macos-latest
 
@@ -44,7 +45,7 @@ jobs:
         name: platform-macos.libtorch-prebuilt.ops-dev
         path: build/upytorch.strip
 
-  test_platform-ubuntu_libtorch-prebuilt_ops-dev:
+  platform-ubuntu_libtorch-prebuilt_ops-dev:
 
     runs-on: ubuntu-latest
 
@@ -61,6 +62,10 @@ jobs:
 
     - uses: ./.github/actions/setup_libtorch_build_env
 
+    - name: install prebuilt pytorch
+      run: |
+        pip install torch==1.7.1+cpu torchvision==0.8.2+cpu torchaudio==0.7.2 -f https://download.pytorch.org/whl/torch_stable.html
+
     - name: make
       run: LIBTORCH=prebuilt make
 
@@ -69,7 +74,14 @@ jobs:
 
     - uses: ./.github/actions/check_binary_size
 
-    - uses: ./.github/actions/check_perf
+    - name: check python3 perf (dynamically linked with the prebuilt libtorch)
+      uses: ./.github/actions/check_perf
+      with:
+        name: py3.prebuilt
+        binary: python3
+
+    - name: check micropython perf (dynamically linked with the prebuilt libtorch)
+      uses: ./.github/actions/check_perf
       with:
         name: upy.prebuilt
 
@@ -85,7 +97,7 @@ jobs:
 #
 ###############################################################################
 
-  build_platform-macos_libtorch-lite_ops-noop:
+  platform-macos_libtorch-lite_ops-noop:
 
     runs-on: macos-latest
 
@@ -113,7 +125,7 @@ jobs:
         name: platform-macos.libtorch-lite.ops-noop
         path: build/upytorch.strip
 
-  build_platform-ubuntu_libtorch-lite_ops-noop:
+  platform-ubuntu_libtorch-lite_ops-noop:
 
     runs-on: ubuntu-latest
 
@@ -141,7 +153,7 @@ jobs:
         name: platform-ubuntu.libtorch-lite.ops-noop
         path: build/upytorch.strip
 
-  build_platform-macos_libtorch-lite_ops-alexnet:
+  platform-macos_libtorch-lite_ops-alexnet:
 
     runs-on: macos-latest
 
@@ -178,7 +190,7 @@ jobs:
         name: platform-macos.libtorch-lite.ops-alexnet
         path: build/upytorch.strip
 
-  build_platform-ubuntu_libtorch-lite_ops-alexnet:
+  platform-ubuntu_libtorch-lite_ops-alexnet:
 
     runs-on: ubuntu-latest
 
@@ -215,7 +227,7 @@ jobs:
         name: platform-ubuntu.libtorch-lite.ops-alexnet
         path: build/upytorch.strip
 
-  build_platform-macos_libtorch-lite_ops-dev:
+  platform-macos_libtorch-lite_ops-dev:
 
     runs-on: macos-latest
 
@@ -243,7 +255,7 @@ jobs:
         name: platform-macos.libtorch-lite.ops-dev
         path: build/upytorch.strip
 
-  build_platform-ubuntu_libtorch-lite_ops-dev:
+  platform-ubuntu_libtorch-lite_ops-dev:
 
     runs-on: ubuntu-latest
 
@@ -265,7 +277,8 @@ jobs:
 
     - uses: ./.github/actions/check_binary_size
 
-    - uses: ./.github/actions/check_perf
+    - name: check micropython perf (statically linked with the locally built lite-libtorch)
+      uses: ./.github/actions/check_perf
       with:
         name: upy.lite.dev
 
