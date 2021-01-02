@@ -4,7 +4,7 @@ import framebuf
 import uio
 
 class FBConsole(uio.IOBase):
-    def __init__(self, fb, bgcolor=0, fgcolor=-1, width=-1, height=-1, readobj=None):
+    def __init__(self, fb, bgcolor=0, fgcolor=-1, ccolor=-1, width=-1, height=-1, readobj=None):
         self.readobj = readobj
         self.fb = fb
         if width > 0:
@@ -23,6 +23,7 @@ class FBConsole(uio.IOBase):
                 raise ValueError
         self.bgcolor = bgcolor
         self.fgcolor = fgcolor
+        self.ccolor = ccolor
         self.char_size(6, 8)
         self.cls()
 
@@ -83,7 +84,7 @@ class FBConsole(uio.IOBase):
             else:
                 self._putc(c)
             i += 1
-        self._draw_cursor(self.fgcolor)
+        self._draw_cursor(self.ccolor)
         try:
             self.fb.show()
         except:
