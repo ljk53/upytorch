@@ -10,6 +10,7 @@ runs:
         strip build/upytorch -o build/upytorch.strip
         tar zcvf build/upytorch.tar.gz build/upytorch.strip
         ls -la build/upytorch*
+        cp build/upytorch.strip build_result
       shell: bash
 
     - name: run bloaty
@@ -18,8 +19,10 @@ runs:
         if [ "$UNAME" != "Darwin" ]; then
           exit 0
         fi
-        brew install bloaty >brew.log 2>brew.err || (cat brew.log && cat brew.err)
-        make clean
-        scripts/run_bloaty.sh >bloaty.log 2>bloaty.err || (cat bloaty.log && cat bloaty.err)
+        echo
+        echo "Run bloaty..."
+        brew install bloaty >log 2>err || (cat log && cat err)
+        make clean >log 2>err || (cat log && cat err)
+        scripts/run_bloaty.sh >log 2>err || (cat log && cat err)
         cat bloaty_result/bloaty_units.txt
       shell: bash

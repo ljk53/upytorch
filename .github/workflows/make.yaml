@@ -44,7 +44,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: ${{ env.NAME }}
-        path: build/upytorch.strip
+        path: build_result
 
     - name: upload bloaty
       uses: actions/upload-artifact@v2
@@ -98,7 +98,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: ${{ env.NAME }}
-        path: build/upytorch.strip
+        path: build_result
 
     - name: upload bloaty
       uses: actions/upload-artifact@v2
@@ -143,7 +143,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: ${{ env.NAME }}
-        path: build/upytorch.strip
+        path: build_result
 
     - name: upload bloaty
       uses: actions/upload-artifact@v2
@@ -182,7 +182,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: ${{ env.NAME }}
-        path: build/upytorch.strip
+        path: build_result
 
     - name: upload bloaty
       uses: actions/upload-artifact@v2
@@ -230,7 +230,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: ${{ env.NAME }}
-        path: build/upytorch.strip
+        path: build_result
 
     - name: upload bloaty
       uses: actions/upload-artifact@v2
@@ -278,7 +278,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: ${{ env.NAME }}
-        path: build/upytorch.strip
+        path: build_result
 
     - name: upload bloaty
       uses: actions/upload-artifact@v2
@@ -317,7 +317,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: ${{ env.NAME }}
-        path: build/upytorch.strip
+        path: build_result
 
     - name: upload bloaty
       uses: actions/upload-artifact@v2
@@ -361,7 +361,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: ${{ env.NAME }}
-        path: build/upytorch.strip
+        path: build_result
 
     - name: upload bloaty
       uses: actions/upload-artifact@v2
