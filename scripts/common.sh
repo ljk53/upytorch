@@ -13,11 +13,11 @@ echo "Installed PyTorch: $(python3 -I -c 'import torch; print(torch.__version__)
 echo "Commit: $(git rev-parse HEAD)"
 echo "Bash: $(/bin/bash --version | head -1)"
 echo
-echo "ROOT: $ROOT"
-echo "PYTORCH_ROOT: $PYTORCH_ROOT"
-echo "MICROPYPATH: $MICROPYPATH"
-echo "PYTHONPATH: $PYTHONPATH"
-echo "MYPYPATH: $MYPYPATH"
+echo "ROOT: ${ROOT:-unset}"
+echo "PYTORCH_ROOT: ${PYTORCH_ROOT:-unset}"
+echo "MICROPYPATH: ${MICROPYPATH:-unset}"
+echo "PYTHONPATH: ${PYTHONPATH:-unset}"
+echo "MYPYPATH: ${MYPYPATH:-unset}"
 echo
 echo "LIBTORCH: ${LIBTORCH:-unset}"
 echo "OP_SELECTION_YAML: ${OP_SELECTION_YAML:-unset}"
