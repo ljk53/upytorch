@@ -8,6 +8,8 @@ source $ROOT/scripts/common.sh
 
 set -x
 
+PYTHON_SETUP_CMD=${PYTHON_SETUP_CMD:-develop}
+
 install_dependencies() {
   # Follow PyTorch local build instruction: https://github.com/pytorch/pytorch#from-source
   echo "Install conda dependencies..."
@@ -35,7 +37,7 @@ build_pytorch() {
     BUILD_BINARY=OFF \
     BUILD_TEST=OFF \
     USE_DISTRIBUTED=OFF \
-    python3 setup.py develop --user
+    python3 setup.py $PYTHON_SETUP_CMD --user
 }
 
 #install_dependencies

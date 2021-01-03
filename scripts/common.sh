@@ -8,7 +8,7 @@ export MYPYPATH=$ROOT/pytorch
 
 echo
 echo "System: $(uname -a)"
-echo "Installed PyTorch: $(cd $PYTORCH_ROOT; python3 -c 'import torch; print(torch.__version__)' 2>/dev/null || echo 'Unknown')"
+echo "Installed PyTorch: $(python3 -I -c 'import torch; print(torch.__version__)' 2>/dev/null || echo 'Unknown')"
 echo "Commit: $(git rev-parse HEAD)"
 echo "Bash: $(/bin/bash --version | head -1)"
 echo
