@@ -7,12 +7,13 @@ on:
     branches: [ main ]
 
 jobs:
-  build_platform-esp_libtorch-lite_ops-dev:
+  build_platform-esp_libtorch-lite_ops-dev-with-dummy:
 
     runs-on: ubuntu-latest
     env:
       LIBTORCH: local_esp
       OP_SELECTION_YAML: tools/dev_with_dummy.yaml
+      IDF_PATH: esp32/esp-idf
 
     steps:
     - uses: actions/checkout@v2
@@ -37,7 +38,6 @@ jobs:
 
     - name: install ESP-IDF toolchain & pip dependencies
       run: |
-        export IDF_PATH=$(pwd)/esp32/esp-idf
         $IDF_PATH/install.sh
         source $IDF_PATH/export.sh
         python3 -m pip install --upgrade pip
@@ -45,7 +45,6 @@ jobs:
 
     - name: make
       run: |
-        export IDF_PATH=$(pwd)/esp32/esp-idf
         source $IDF_PATH/export.sh
         make
 
