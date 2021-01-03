@@ -24,5 +24,5 @@ runs:
         brew install bloaty >log 2>err || (cat log && cat err)
         make clean >log 2>err || (cat log && cat err)
         scripts/run_bloaty.sh >log 2>err || (cat log && cat err)
-        cat bloaty_result/bloaty_units.txt
+        cat output_bloaty/bloaty_units.txt
       shell: bash

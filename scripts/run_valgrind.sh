@@ -5,7 +5,7 @@ set -eu -o pipefail
 ROOT="$( cd "$(dirname "$0")" ; pwd -P)/.."
 source $ROOT/scripts/common.sh
 
-OUT_DIR=$ROOT/valgrind_result
+OUT_DIR=$ROOT/output_valgrind
 mkdir -p $OUT_DIR
 
 NAME=${NAME:-upy}

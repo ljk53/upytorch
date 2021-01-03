@@ -8,12 +8,12 @@ source $ROOT/scripts/common.sh
 
 set -x
 
-OUT_DIR=$ROOT/bloaty_result
+OUT_DIR=$ROOT/output_bloaty
 mkdir -p $OUT_DIR
 
 cd "$ROOT"
 
-make DEBUG=1
+make DEBUG=1 WHY_LIVE=1 > $OUT_DIR/why_live.txt 2>&1
 
 strip build/upytorch -o build/upytorch.strip
 

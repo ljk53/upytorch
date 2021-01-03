@@ -50,7 +50,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: bloaty-${{ env.NAME }}
-        path: bloaty_result
+        path: output_bloaty
         if-no-files-found: ignore
 
   platform-ubuntu_libtorch-prebuilt_ops-dev:
@@ -104,7 +104,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: bloaty-${{ env.NAME }}
-        path: bloaty_result
+        path: output_bloaty
         if-no-files-found: ignore
 
 ###############################################################################
@@ -149,7 +149,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: bloaty-${{ env.NAME }}
-        path: bloaty_result
+        path: output_bloaty
         if-no-files-found: ignore
 
   platform-ubuntu_libtorch-lite_ops-noop:
@@ -188,7 +188,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: bloaty-${{ env.NAME }}
-        path: bloaty_result
+        path: output_bloaty
         if-no-files-found: ignore
 
   platform-macos_libtorch-lite_ops-alexnet:
@@ -236,7 +236,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: bloaty-${{ env.NAME }}
-        path: bloaty_result
+        path: output_bloaty
         if-no-files-found: ignore
 
   platform-ubuntu_libtorch-lite_ops-alexnet:
@@ -284,7 +284,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: bloaty-${{ env.NAME }}
-        path: bloaty_result
+        path: output_bloaty
         if-no-files-found: ignore
 
   platform-macos_libtorch-lite_ops-dev-with-dummy:
@@ -323,7 +323,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: bloaty-${{ env.NAME }}
-        path: bloaty_result
+        path: output_bloaty
         if-no-files-found: ignore
 
   platform-ubuntu_libtorch-lite_ops-dev-with-dummy:
@@ -367,5 +367,5 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: bloaty-${{ env.NAME }}
-        path: bloaty_result
+        path: output_bloaty
         if-no-files-found: ignore
