@@ -88,4 +88,21 @@ run_simple_add() {
   run_benchmark $NAME $BIN simple_add add_s1024 5000
 }
 
+run_dummy() {
+  show_header
+  run_benchmark $NAME $BIN interp python_loop 1000
+  run_benchmark $NAME $BIN interp python_loop 10000
+  run_benchmark $NAME $BIN interp python_add 1000
+  run_benchmark $NAME $BIN interp python_add 10000
+
+if [ "$LIBTORCH" != "prebuilt" ]; then
+  run_benchmark $NAME $BIN dummy dummy_in 1000
+  run_benchmark $NAME $BIN dummy dummy_in 10000
+  run_benchmark $NAME $BIN dummy dummy 1000
+  run_benchmark $NAME $BIN dummy dummy 10000
+  run_benchmark $NAME $BIN dummy dummy_out 1000
+  run_benchmark $NAME $BIN dummy dummy_out 10000
+fi
+}
+
 $@

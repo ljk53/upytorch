@@ -28,6 +28,9 @@ echo
 
 printf '=%.0s' {1..100}
 echo
+if [ "$LIBTORCH" != "prebuilt" ]; then
+$TASKSET $BIN benchmark/dummy.py
+fi
 $TASKSET $BIN benchmark/simple_add.py
 $TASKSET $BIN benchmark/alexnet.py
 echo
