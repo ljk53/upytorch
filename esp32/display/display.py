@@ -37,6 +37,12 @@ class DisplayAdapter(object):
 
 
 def init():
+    width = 320
+    height = 240
+    bgcolor = color565(255, 255, 255)
+    fgcolor = color565(255, 0, 255)
+    cursor_color = color565(0, 255, 255)
+
     power = Pin(m5stack.TFT_LED_PIN, Pin.OUT)
     power.value(1)
     spi = SPI(
@@ -51,11 +57,12 @@ def init():
         cs=Pin(m5stack.TFT_CS_PIN),
         dc=Pin(m5stack.TFT_DC_PIN),
         rst=Pin(m5stack.TFT_RST_PIN),
-        w=240, # NB - the driver takes rotated size
-        h=320,
+        w=height, # NB - the driver takes rotated size
+        h=width,
         r=6)
 
     display.set_font(glcdfont)
-    adapter = DisplayAdapter(display, width=320, height=240)
-    scr = FBConsole(adapter, bgcolor=color565(0, 0, 0), fgcolor=color565(255, 255, 255), ccolor=color565(255, 255, 255))
+    display.set_color(fg=fgcolor, bg=bgcolor)
+    adapter = DisplayAdapter(display, width=width, height=height)
+    scr = FBConsole(adapter, bgcolor=bgcolor, fgcolor=fgcolor, ccolor=cursor_color)
     os.dupterm(scr)
