@@ -8,7 +8,7 @@ source $ROOT/scripts/common.sh
 
 set -x
 
-OUT_DIR=$ROOT/output_bloaty
+OUT_DIR=$ROOT/output_size
 mkdir -p $OUT_DIR
 
 cd "$ROOT"

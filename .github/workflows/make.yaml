@@ -46,11 +46,18 @@ jobs:
         name: ${{ env.NAME }}
         path: build_result
 
-    - name: upload bloaty
+    - name: upload size analysis
       uses: actions/upload-artifact@v2
       with:
-        name: bloaty-${{ env.NAME }}
-        path: output_bloaty
+        name: analysis-size-${{ env.NAME }}
+        path: output_size
+        if-no-files-found: ignore
+
+    - name: upload perf analysis
+      uses: actions/upload-artifact@v2
+      with:
+        name: analysis-perf-${{ env.NAME }}
+        path: output_perf
         if-no-files-found: ignore
 
   platform-ubuntu_libtorch-prebuilt_ops-dev:
@@ -100,11 +107,18 @@ jobs:
         name: ${{ env.NAME }}
         path: build_result
 
-    - name: upload bloaty
+    - name: upload size analysis
       uses: actions/upload-artifact@v2
       with:
-        name: bloaty-${{ env.NAME }}
-        path: output_bloaty
+        name: analysis-size-${{ env.NAME }}
+        path: output_size
+        if-no-files-found: ignore
+
+    - name: upload perf analysis
+      uses: actions/upload-artifact@v2
+      with:
+        name: analysis-perf-${{ env.NAME }}
+        path: output_perf
         if-no-files-found: ignore
 
 ###############################################################################
@@ -145,11 +159,18 @@ jobs:
         name: ${{ env.NAME }}
         path: build_result
 
-    - name: upload bloaty
+    - name: upload size analysis
       uses: actions/upload-artifact@v2
       with:
-        name: bloaty-${{ env.NAME }}
-        path: output_bloaty
+        name: analysis-size-${{ env.NAME }}
+        path: output_size
+        if-no-files-found: ignore
+
+    - name: upload perf analysis
+      uses: actions/upload-artifact@v2
+      with:
+        name: analysis-perf-${{ env.NAME }}
+        path: output_perf
         if-no-files-found: ignore
 
   platform-ubuntu_libtorch-lite_ops-noop:
@@ -184,11 +205,18 @@ jobs:
         name: ${{ env.NAME }}
         path: build_result
 
-    - name: upload bloaty
+    - name: upload size analysis
       uses: actions/upload-artifact@v2
       with:
-        name: bloaty-${{ env.NAME }}
-        path: output_bloaty
+        name: analysis-size-${{ env.NAME }}
+        path: output_size
+        if-no-files-found: ignore
+
+    - name: upload perf analysis
+      uses: actions/upload-artifact@v2
+      with:
+        name: analysis-perf-${{ env.NAME }}
+        path: output_perf
         if-no-files-found: ignore
 
   platform-macos_libtorch-lite_ops-alexnet:
@@ -232,11 +260,18 @@ jobs:
         name: ${{ env.NAME }}
         path: build_result
 
-    - name: upload bloaty
+    - name: upload size analysis
       uses: actions/upload-artifact@v2
       with:
-        name: bloaty-${{ env.NAME }}
-        path: output_bloaty
+        name: analysis-size-${{ env.NAME }}
+        path: output_size
+        if-no-files-found: ignore
+
+    - name: upload perf analysis
+      uses: actions/upload-artifact@v2
+      with:
+        name: analysis-perf-${{ env.NAME }}
+        path: output_perf
         if-no-files-found: ignore
 
   platform-ubuntu_libtorch-lite_ops-alexnet:
@@ -280,11 +315,18 @@ jobs:
         name: ${{ env.NAME }}
         path: build_result
 
-    - name: upload bloaty
+    - name: upload size analysis
       uses: actions/upload-artifact@v2
       with:
-        name: bloaty-${{ env.NAME }}
-        path: output_bloaty
+        name: analysis-size-${{ env.NAME }}
+        path: output_size
+        if-no-files-found: ignore
+
+    - name: upload perf analysis
+      uses: actions/upload-artifact@v2
+      with:
+        name: analysis-perf-${{ env.NAME }}
+        path: output_perf
         if-no-files-found: ignore
 
   platform-macos_libtorch-lite_ops-dev-with-dummy:
@@ -319,11 +361,18 @@ jobs:
         name: ${{ env.NAME }}
         path: build_result
 
-    - name: upload bloaty
+    - name: upload size analysis
       uses: actions/upload-artifact@v2
       with:
-        name: bloaty-${{ env.NAME }}
-        path: output_bloaty
+        name: analysis-size-${{ env.NAME }}
+        path: output_size
+        if-no-files-found: ignore
+
+    - name: upload perf analysis
+      uses: actions/upload-artifact@v2
+      with:
+        name: analysis-perf-${{ env.NAME }}
+        path: output_perf
         if-no-files-found: ignore
 
   platform-ubuntu_libtorch-lite_ops-dev-with-dummy:
@@ -363,9 +412,16 @@ jobs:
         name: ${{ env.NAME }}
         path: build_result
 
-    - name: upload bloaty
+    - name: upload size analysis
       uses: actions/upload-artifact@v2
       with:
-        name: bloaty-${{ env.NAME }}
-        path: output_bloaty
+        name: analysis-size-${{ env.NAME }}
+        path: output_size
+        if-no-files-found: ignore
+
+    - name: upload perf analysis
+      uses: actions/upload-artifact@v2
+      with:
+        name: analysis-perf-${{ env.NAME }}
+        path: output_perf
         if-no-files-found: ignore

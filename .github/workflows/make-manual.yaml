@@ -25,6 +25,7 @@ jobs:
 
     runs-on: ubuntu-latest
     env:
+      NAME: platform-ubuntu.libtorch-local.ops-dev-with-dummy
       LIBTORCH: local
       OP_SELECTION_YAML: tools/dev_with_dummy.yaml
       PYTHON_SETUP_CMD: install
@@ -76,3 +77,10 @@ jobs:
       uses: ./.github/actions/check_perf
       with:
         name: upy.local
+
+    - name: upload perf analysis
+      uses: actions/upload-artifact@v2
+      with:
+        name: analysis-perf-${{ env.NAME }}
+        path: output_perf
+        if-no-files-found: ignore
