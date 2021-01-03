@@ -3,10 +3,7 @@
 set -eu -o pipefail
 
 ROOT="$( cd "$(dirname "$0")" ; pwd -P)/.."
-PYTORCH_ROOT=$ROOT/pytorch
-export MICROPYPATH=$ROOT
-
-source $ROOT/scripts/print_context.sh
+source $ROOT/scripts/common.sh
 
 NAME=${NAME:-upy}
 BIN=${BIN:-$ROOT/build/upytorch}

@@ -3,15 +3,13 @@
 set -eu -o pipefail
 
 ROOT="$( cd "$(dirname "$0")" ; pwd -P)/.."
-PYTORCH_ROOT=$ROOT/pytorch
-export MICROPYPATH=$ROOT
+source $ROOT/scripts/common.sh
+
 OUT_DIR=$ROOT/valgrind_result
-source $ROOT/scripts/print_context.sh
+mkdir -p $OUT_DIR
 
 NAME=${NAME:-upy}
 BIN=${BIN:-$ROOT/build/upytorch}
-
-mkdir -p $OUT_DIR
 
 cd "$ROOT/benchmark"
 
@@ -66,6 +64,9 @@ run_benchmark() {
   local func=$4
   local count=$5
   local runid="$name.$module.$func.N$count"
+
+  # run it once to make sure it does not fail silently
+  $runner -c "$(cmd_benchmark $module $func 1)"
 
   $(cmd_valgrind $runid.n) $runner -c "$(cmd_benchmark $module $func $count)"
   local once=$(cmd_total_insts $runid.n)

@@ -27,6 +27,7 @@ jobs:
     env:
       LIBTORCH: local
       OP_SELECTION_YAML: tools/dev_with_dummy.yaml
+      PYTHON_SETUP_CMD: install
 
     steps:
     - uses: actions/checkout@v2
