@@ -25,7 +25,7 @@ echo
 
 printf '=%.0s' {1..100}
 echo
-if [ "${LIBTORCH:-}" != "prebuilt" ]; then
+if [[ "${OP_SELECTION_YAML:-}" == *"dummy"* ]]; then
 $TASKSET $BIN benchmark/dummy.py
 fi
 $TASKSET $BIN benchmark/simple_add.py

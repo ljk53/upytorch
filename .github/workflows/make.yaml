@@ -287,13 +287,13 @@ jobs:
         path: bloaty_result
         if-no-files-found: ignore
 
-  platform-macos_libtorch-lite_ops-dev:
+  platform-macos_libtorch-lite_ops-dev-with-dummy:
 
     runs-on: macos-latest
     env:
-      NAME: platform-macos.libtorch-lite.ops-dev
+      NAME: platform-macos.libtorch-lite.ops-dev-with-dummy
       LIBTORCH: local_lite
-      OP_SELECTION_YAML: tools/dev.yaml
+      OP_SELECTION_YAML: tools/dev_with_dummy.yaml
 
     steps:
     - uses: actions/checkout@v2
@@ -326,13 +326,13 @@ jobs:
         path: bloaty_result
         if-no-files-found: ignore
 
-  platform-ubuntu_libtorch-lite_ops-dev:
+  platform-ubuntu_libtorch-lite_ops-dev-with-dummy:
 
     runs-on: ubuntu-latest
     env:
-      NAME: platform-ubuntu.libtorch-lite.ops-dev
+      NAME: platform-ubuntu.libtorch-lite.ops-dev-with-dummy
       LIBTORCH: local_lite
-      OP_SELECTION_YAML: tools/dev.yaml
+      OP_SELECTION_YAML: tools/dev_with_dummy.yaml
 
     steps:
     - uses: actions/checkout@v2

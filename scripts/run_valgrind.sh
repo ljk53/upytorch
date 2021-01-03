@@ -96,7 +96,7 @@ run_dummy() {
   run_benchmark $NAME $BIN interp python_add 1000
   run_benchmark $NAME $BIN interp python_add 10000
 
-if [ "${LIBTORCH:-}" != "prebuilt" ]; then
+if [[ "${OP_SELECTION_YAML:-}" == *"dummy"* ]]; then
   run_benchmark $NAME $BIN dummy dummy_in 1000
   run_benchmark $NAME $BIN dummy dummy_in 10000
   run_benchmark $NAME $BIN dummy dummy 1000

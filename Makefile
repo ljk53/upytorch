@@ -183,6 +183,9 @@ clean:
 ###############################################################################
 # Binding Codegen
 
+$(SRC_ROOT)/tools/dev_with_dummy.yaml: $(SRC_ROOT)/tools/dev.yaml $(SRC_ROOT)/tools/dummy.yaml
+	cat $^ > $@
+
 $(GENERATED_HEADERS) $(GENERATED_SRCS): tools/templates/* $(OP_SELECTION_YAML)
 	BUILD_LITE=$(BUILD_LITE) OP_SELECTION_YAML=$(OP_SELECTION_YAML) scripts/run_codegen.sh
 

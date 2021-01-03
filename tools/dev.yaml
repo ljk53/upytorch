@@ -42,7 +42,3 @@
 - aten::zeros
 - aten::zeros.out
 - aten::zeros_like
-
-- aten::dummy
-- aten::dummy_
-- aten::dummy.out

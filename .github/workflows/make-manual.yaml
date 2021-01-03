@@ -21,12 +21,12 @@ jobs:
 #
 ###############################################################################
 
-  platform-ubuntu_libtorch-local_ops-dev:
+  platform-ubuntu_libtorch-local_ops-dev-with-dummy:
 
     runs-on: ubuntu-latest
     env:
       LIBTORCH: local
-      OP_SELECTION_YAML: tools/dev.yaml
+      OP_SELECTION_YAML: tools/dev_with_dummy.yaml
 
     steps:
     - uses: actions/checkout@v2

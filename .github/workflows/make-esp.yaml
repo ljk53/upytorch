@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       LIBTORCH: local_esp
-      OP_SELECTION_YAML: tools/dev.yaml
+      OP_SELECTION_YAML: tools/dev_with_dummy.yaml
 
     steps:
     - uses: actions/checkout@v2
