@@ -20,5 +20,8 @@ jobs:
     - name: checkout submodules
       run: git submodule update --init --recursive micropython pytorch
 
+    - name: install dependency
+      run: pip install mypy flake8
+
     - name: run lint
       run: scripts/run_lint.sh
