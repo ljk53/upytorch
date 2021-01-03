@@ -15,12 +15,14 @@ runs:
 
     - name: run walltime
       run: |
+        export NAME=${{ inputs.name }}
         if [ -z "${{ inputs.binary }}" ]; then
           export BIN=$(pwd)/build/upytorch
         else
           export BIN="${{ inputs.binary }}"
         fi
-        scripts/run_benchmark.sh
+        mkdir -p output_perf
+        scripts/run_benchmark.sh | tee output_perf/${NAME}_benchmark.txt
       shell: bash
 
     - name: run valgrind
@@ -31,6 +33,7 @@ runs:
         else
           export BIN="${{ inputs.binary }}"
         fi
-        scripts/run_valgrind.sh run_dummy
-        scripts/run_valgrind.sh run_simple_add
+        mkdir -p output_perf
+        scripts/run_valgrind.sh run_dummy | tee -a output_perf/${NAME}_valgrind.txt
+        scripts/run_valgrind.sh run_simple_add | tee -a output_perf/${NAME}_valgrind.txt
       shell: bash
