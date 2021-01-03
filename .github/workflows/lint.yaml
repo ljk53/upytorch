@@ -20,6 +20,11 @@ jobs:
     - name: checkout submodules
       run: git submodule update --init --recursive micropython pytorch
 
+    - name: setup python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+
     - name: install dependency
       run: pip install mypy flake8
 
