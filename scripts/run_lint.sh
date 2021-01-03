@@ -9,4 +9,6 @@ set -x
 cd "$ROOT"
 
 mypy --config mypy-strict.ini
-flake8 tools/*.py
+
+# setup pytorch path to local fork only for lint
+PYTHONPATH=$ROOT/pytorch flake8 tools/*.py

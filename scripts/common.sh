@@ -3,7 +3,8 @@ PYTORCH_ROOT="${PYTORCH_ROOT:-$ROOT/pytorch}"
 UNAME=$(uname -s)
 
 export MICROPYPATH=$ROOT
-export PYTHONPATH=$ROOT/pytorch
+# Don't setup PYTHONPATH to source code - always use installed version
+# export PYTHONPATH=$ROOT/pytorch
 export MYPYPATH=$ROOT/pytorch
 
 echo
