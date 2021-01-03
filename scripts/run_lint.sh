@@ -9,4 +9,4 @@ set -x
 cd "$ROOT"
 
 mypy --config mypy-strict.ini
-flake8-3 tools/*.py
+flake8 tools/*.py

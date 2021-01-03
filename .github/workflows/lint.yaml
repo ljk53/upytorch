@@ -1,0 +1,24 @@
+name: Lint
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  run_lint:
+    runs-on: ubuntu-latest
+    env:
+      NAME: platform-ubuntu.libtorch-prebuilt.ops-dev
+      LIBTORCH: prebuilt
+      OP_SELECTION_YAML: tools/dev.yaml
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: checkout submodules
+      run: git submodule update --init --recursive micropython pytorch
+
+    - name: run lint
+      run: scripts/run_lint.sh
