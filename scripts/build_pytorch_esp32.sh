@@ -33,7 +33,7 @@ fi
 
 CMAKE_ARGS+=("-DCMAKE_TOOLCHAIN_FILE=$ROOT/esp32/esp-idf/tools/cmake/toolchain-esp32.cmake")
 CMAKE_ARGS+=("-DCMAKE_C_FLAGS='-mlongcalls -DESP_PLATFORM'")
-CMAKE_ARGS+=("-DCMAKE_CXX_FLAGS='-mlongcalls -DESP_PLATFORM -DSELECTED_DTYPES=float'")
+CMAKE_ARGS+=("-DCMAKE_CXX_FLAGS='-mlongcalls -DESP_PLATFORM'")
 
 # Disable unused dependencies
 CMAKE_ARGS+=("-DBUILD_LITE=ON")
