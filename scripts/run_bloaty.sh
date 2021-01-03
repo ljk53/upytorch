@@ -5,10 +5,11 @@ set -eux -o pipefail
 
 ROOT="$( cd "$(dirname "$0")" ; pwd -P)/.."
 OUT_DIR=$ROOT/bloaty_result
+UNAME=$(uname -s)
+
+source $ROOT/scripts/print_context.sh
 
 mkdir -p $OUT_DIR
-
-UNAME=$(uname -s)
 
 cd "$ROOT"
 

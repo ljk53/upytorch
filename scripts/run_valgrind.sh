@@ -6,6 +6,7 @@ ROOT="$( cd "$(dirname "$0")" ; pwd -P)/.."
 PYTORCH_ROOT=$ROOT/pytorch
 export MICROPYPATH=$ROOT
 OUT_DIR=$ROOT/valgrind_result
+source $ROOT/scripts/print_context.sh
 
 NAME=${NAME:-upy}
 BIN=${BIN:-$ROOT/build/upytorch}
@@ -95,7 +96,7 @@ run_dummy() {
   run_benchmark $NAME $BIN interp python_add 1000
   run_benchmark $NAME $BIN interp python_add 10000
 
-if [ "$LIBTORCH" != "prebuilt" ]; then
+if [ "${LIBTORCH:-}" != "prebuilt" ]; then
   run_benchmark $NAME $BIN dummy dummy_in 1000
   run_benchmark $NAME $BIN dummy dummy_in 10000
   run_benchmark $NAME $BIN dummy dummy 1000
