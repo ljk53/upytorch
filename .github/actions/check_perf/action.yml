@@ -9,8 +9,8 @@ runs:
   steps:
     - name: install valgrind
       run: |
-        sudo apt-get update -y > apt.log.txt 2> apt.err.txt || (cat apt.log.txt && cat apt.err.txt)
-        sudo apt-get install valgrind -y > apt.log.txt 2> apt.err.txt || (cat apt.log.txt && cat apt.err.txt)
+        sudo apt-get update -y > log.txt 2> err.txt || (cat log.txt && cat err.txt)
+        sudo apt-get install valgrind -y > log.txt 2> err.txt || (cat log.txt && cat err.txt)
       shell: bash
 
     - name: run walltime
@@ -31,5 +31,6 @@ runs:
         else
           export BIN="${{ inputs.binary }}"
         fi
+        scripts/run_valgrind.sh run_dummy
         scripts/run_valgrind.sh run_simple_add
       shell: bash
