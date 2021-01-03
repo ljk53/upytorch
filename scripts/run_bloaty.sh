@@ -1,14 +1,14 @@
 #!/bin/bash
 # Use this script to measure upytorch binary size.
 
-set -eux -o pipefail
+set -eu -o pipefail
 
 ROOT="$( cd "$(dirname "$0")" ; pwd -P)/.."
+source $ROOT/scripts/common.sh
+
+set -x
+
 OUT_DIR=$ROOT/bloaty_result
-UNAME=$(uname -s)
-
-source $ROOT/scripts/print_context.sh
-
 mkdir -p $OUT_DIR
 
 cd "$ROOT"

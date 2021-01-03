@@ -6,10 +6,11 @@
 set -e
 
 export BUILD_PYTORCH_MOBILE_WITH_HOST_TOOLCHAIN=1
-PYTORCH_ROOT="$( cd "$(dirname "$0")"/../pytorch ; pwd -P)"
 
-echo "Bash: $(/bin/bash --version | head -1)"
-echo "PYTORCH_ROOT: $PYTORCH_ROOT"
+ROOT="$( cd "$(dirname "$0")" ; pwd -P)/.."
+source $ROOT/scripts/common.sh
+
+set -x
 
 CMAKE_ARGS=()
 CMAKE_ARGS+=("-DCMAKE_PREFIX_PATH=$(python -c 'from distutils.sysconfig import get_python_lib; print(get_python_lib())')")

@@ -5,21 +5,20 @@
 
 set -e
 
-SRC_ROOT="$( cd "$(dirname "$0")"/.. ; pwd -P)"
-PYTORCH_ROOT=$SRC_ROOT/pytorch
+ROOT="$( cd "$(dirname "$0")" ; pwd -P)/.."
+source $ROOT/scripts/common.sh
 
 printf '=%.0s' {1..100}
 echo
-echo "Run '$SRC_ROOT/esp32/esp-idf/install.sh' if you haven't..."
+echo "Run '$ROOT/esp32/esp-idf/install.sh' if you haven't..."
 printf '=%.0s' {1..100}
 echo
-export IDF_PATH=$SRC_ROOT/esp32/esp-idf
+export IDF_PATH=$ROOT/esp32/esp-idf
 source $IDF_PATH/export.sh
 printf '=%.0s' {1..100}
 echo
 
-echo "Bash: $(/bin/bash --version | head -1)"
-echo "PYTORCH_ROOT: $PYTORCH_ROOT"
+set -x
 
 CMAKE_ARGS=()
 CMAKE_ARGS+=("-DCMAKE_PREFIX_PATH=$(python -c 'from distutils.sysconfig import get_python_lib; print(get_python_lib())')")
@@ -32,7 +31,7 @@ if [ -x "$(command -v ninja)" ]; then
   CMAKE_ARGS+=("-GNinja")
 fi
 
-CMAKE_ARGS+=("-DCMAKE_TOOLCHAIN_FILE=$SRC_ROOT/esp32/esp-idf/tools/cmake/toolchain-esp32.cmake")
+CMAKE_ARGS+=("-DCMAKE_TOOLCHAIN_FILE=$ROOT/esp32/esp-idf/tools/cmake/toolchain-esp32.cmake")
 CMAKE_ARGS+=("-DCMAKE_C_FLAGS='-mlongcalls -DESP_PLATFORM'")
 CMAKE_ARGS+=("-DCMAKE_CXX_FLAGS='-mlongcalls -DESP_PLATFORM -DSELECTED_DTYPES=float'")
 

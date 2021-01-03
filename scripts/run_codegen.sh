@@ -1,13 +1,16 @@
 #!/bin/bash
 
-set -ex -o pipefail
+set -e -o pipefail
 
 ROOT="$( cd "$(dirname "$0")" ; pwd -P)/.."
+source $ROOT/scripts/common.sh
+
+set -x
+
 OUT=${OUT:-wrapper/generated}
+mkdir -p $OUT
 
 cd "$ROOT"
-
-mkdir -p $OUT
 
 ARGS=()
 ARGS+=(--native_functions pytorch/aten/src/ATen/native/native_functions.yaml)

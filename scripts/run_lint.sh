@@ -1,11 +1,12 @@
 #!/bin/bash
 
-set -eux -o pipefail
+set -eu -o pipefail
 
 ROOT="$( cd "$(dirname "$0")" ; pwd -P)/.."
+source $ROOT/scripts/common.sh
+set -x
 
 cd "$ROOT"
 
-MYPYPATH=pytorch mypy --config mypy-strict.ini
-
-PYTHONPATH=pytorch flake8-3 tools/*.py
+mypy --config mypy-strict.ini
+flake8-3 tools/*.py

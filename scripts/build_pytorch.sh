@@ -1,10 +1,12 @@
 #!/bin/bash
 # Use this script to checkout pytorch source and build it locally.
 
-set -eux -o pipefail
+set -eu -o pipefail
 
 ROOT="$( cd "$(dirname "$0")" ; pwd -P)/.."
-PYTORCH_ROOT="${PYTORCH_ROOT:-$ROOT/pytorch}"
+source $ROOT/scripts/common.sh
+
+set -x
 
 install_dependencies() {
   # Follow PyTorch local build instruction: https://github.com/pytorch/pytorch#from-source
