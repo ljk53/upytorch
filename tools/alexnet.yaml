@@ -1,3 +1,5 @@
+# SELECTED_FEATURES=
+# SELECTED_DTYPES=float
 - aten::adaptive_avg_pool2d
 - aten::addmm
 - aten::conv2d
