@@ -80,29 +80,29 @@ run_benchmark() {
 
 run_simple_add() {
   show_header
-  run_benchmark $NAME $BIN simple_add add_s1_nograd_outplace 500
-  run_benchmark $NAME $BIN simple_add add_s1_nograd_outplace 5000
+  run_benchmark $NAME $BIN simple_add add_s1_outplace 3000
+  run_benchmark $NAME $BIN simple_add add_s1_outplace 6000
 
-  run_benchmark $NAME $BIN simple_add add_s1 500
-  run_benchmark $NAME $BIN simple_add add_s1 5000
+  run_benchmark $NAME $BIN simple_add add_s1 3000
+  run_benchmark $NAME $BIN simple_add add_s1 6000
 
-  run_benchmark $NAME $BIN simple_add add_s1024 500
-  run_benchmark $NAME $BIN simple_add add_s1024 5000
+  run_benchmark $NAME $BIN simple_add add_s1024 3000
+  run_benchmark $NAME $BIN simple_add add_s1024 6000
 }
 
 run_dummy() {
   show_header
-  run_benchmark $NAME $BIN interp python_loop 1000
+  run_benchmark $NAME $BIN interp python_loop 3000
   run_benchmark $NAME $BIN interp python_loop 10000
-  run_benchmark $NAME $BIN interp python_add 1000
+  run_benchmark $NAME $BIN interp python_add 3000
   run_benchmark $NAME $BIN interp python_add 10000
 
 if [[ "${OP_SELECTION_YAML:-}" == *"dummy"* ]]; then
-  run_benchmark $NAME $BIN dummy dummy_in 1000
+  run_benchmark $NAME $BIN dummy dummy_in 3000
   run_benchmark $NAME $BIN dummy dummy_in 10000
-  run_benchmark $NAME $BIN dummy dummy 1000
+  run_benchmark $NAME $BIN dummy dummy 3000
   run_benchmark $NAME $BIN dummy dummy 10000
-  run_benchmark $NAME $BIN dummy dummy_out 1000
+  run_benchmark $NAME $BIN dummy dummy_out 3000
   run_benchmark $NAME $BIN dummy dummy_out 10000
 fi
 }
