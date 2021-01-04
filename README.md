@@ -1,3 +1,7 @@
+![Lint](https://github.com/ljk53/upytorch/workflows/Lint/badge.svg)
+![Builds / Tests / Benchmarks](https://github.com/ljk53/upytorch/workflows/Builds%20/%20Tests%20/%20Benchmarks/badge.svg)
+![ESP32](https://github.com/ljk53/upytorch/workflows/ESP32/badge.svg)
+![Manual Build](https://github.com/ljk53/upytorch/workflows/Manual%20Build/badge.svg)
 
 ## Quick Start
 
@@ -6,14 +10,38 @@
 git clone --recursive https://github.com/ljk53/upytorch
 ```
 
-* (Option 1) Build everything locally and run unit tests
+* (Option 1) Build MicroPython + PyTorch binding locally, link against the prebuilt LibTorch 1.7 from official website
+```bash
+LIBTORCH=prebuilt make test
+```
+
+* (Option 2) Build everything locally and run unit tests
 ```bash
 make test
 ```
 
-* (Option 2) Build MicroPython + PyTorch binding locally, link against prebuilt LibTorch 1.7 from official website
+* (Option 3) Optimize binary size to only include selected ops/dtypes/features and to strip out autograd function
 ```bash
-make LIBTORCH=linux test
+# The selective builds do not necessarily include all ops to pass unit tests.
+
+# For AlexNet model:
+LIBTORCH=local_lite OP_SELECTION_YAML=tools/alexnet.yaml make
+
+# No ops:
+LIBTORCH=local_lite OP_SELECTION_YAML=tools/noop.yaml make
+
+# Dev ops:
+LIBTORCH=local_lite OP_SELECTION_YAML=tools/dev.yaml make
+```
+
+* (Option 4) Build ESP32 firmware
+```bash
+# Check out the CI job: https://github.com/ljk53/upytorch/blob/main/.github/workflows/make-esp.yaml
+export IDF_PATH=esp32/esp-idf
+$IDF_PATH/install.sh
+source $IDF_PATH/export.sh
+pip3 install -r pytorch/requirements.txt
+LIBTORCH=local_esp make
 ```
 
 * Launch the REPL shell to play with it
