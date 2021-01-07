@@ -29,6 +29,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
+#include <unistd.h>
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -50,6 +51,7 @@
 #include "py/persistentcode.h"
 #include "py/repl.h"
 #include "py/gc.h"
+#include "py/mperrno.h"
 #include "py/mphal.h"
 #include "lib/mp-readline/readline.h"
 #include "lib/utils/pyexec.h"
@@ -57,6 +59,7 @@
 #include "modmachine.h"
 #include "modnetwork.h"
 #include "mpthreadport.h"
+#include "driver/i2c.h"
 
 #if MICROPY_BLUETOOTH_NIMBLE
 #include "extmod/modbluetooth.h"
@@ -69,6 +72,52 @@
 int vprintf_null(const char *format, va_list ap) {
     // do nothing: this is used as a log target during raw repl mode
     return 0;
+}
+
+int i2c_read(uint16_t addr, unsigned char *buf, size_t len) {
+    i2c_cmd_handle_t cmd = i2c_cmd_link_create();
+    i2c_master_start(cmd);
+    i2c_master_write_byte(cmd, addr << 1 | 0x01, true);
+    i2c_master_read(cmd, buf, len, I2C_MASTER_ACK);
+    // i2c_master_stop(cmd);
+
+    // TODO proper timeout
+    esp_err_t err = i2c_master_cmd_begin(I2C_NUM_0, cmd, 100 * (1 + len) / portTICK_RATE_MS);
+    i2c_cmd_link_delete(cmd);
+
+    if (err == ESP_FAIL) {
+        return -MP_ENODEV;
+    } else if (err == ESP_ERR_TIMEOUT) {
+        return -MP_ETIMEDOUT;
+    } else if (err != ESP_OK) {
+        return -abs(err);
+    }
+
+    return len;
+}
+
+void keyboard_task(void *pvParameter) {
+    i2c_config_t conf = {
+        .mode = I2C_MODE_MASTER,
+        .sda_io_num = GPIO_NUM_21,
+        .sda_pullup_en = GPIO_PULLUP_ENABLE,
+        .scl_io_num = GPIO_NUM_22,
+        .scl_pullup_en = GPIO_PULLUP_ENABLE,
+        .master.clk_speed = 400000,
+    };
+    i2c_param_config(I2C_NUM_0, &conf);
+    i2c_set_timeout(I2C_NUM_0, I2C_APB_CLK_FREQ / 1000000 * 10000 /* 10ms */);
+    i2c_driver_install(I2C_NUM_0, I2C_MODE_MASTER, 0, 0, 0);
+    unsigned char ch;
+
+    for (;;) {
+        ch = 0;
+        int c = i2c_read(0x08, &ch, 1);
+        if (c > 0 && ch > 0) {
+            ringbuf_put(&stdin_ringbuf, ch);
+        }
+        usleep(1000);
+    }
 }
 
 void mp_task(void *pvParameter) {
@@ -162,12 +211,15 @@ soft_reset:
     goto soft_reset;
 }
 
+TaskHandle_t mp_keyboard_task_handle;
+
 void app_main(void) {
     esp_err_t ret = nvs_flash_init();
     if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
         nvs_flash_erase();
         nvs_flash_init();
     }
+    xTaskCreate(keyboard_task, "keyboard_task", 1024, NULL, MP_TASK_PRIORITY, &mp_keyboard_task_handle);
     xTaskCreatePinnedToCore(mp_task, "mp_task", MP_TASK_STACK_SIZE / sizeof(StackType_t), NULL, MP_TASK_PRIORITY, &mp_main_task_handle, MP_TASK_COREID);
 }
 
