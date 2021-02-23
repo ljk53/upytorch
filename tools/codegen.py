@@ -18,7 +18,8 @@ from tools.codegen.api.python import (
 
 from tools.codegen.model import NativeFunction, BaseOperatorName, Variant
 
-from tools.codegen.gen import cpp_string, with_native_function, FileManager
+from tools.codegen.context import with_native_function
+from tools.codegen.gen import cpp_string, FileManager
 from tools.autograd.gen_python_functions import (
     is_noarg, load_signatures, group_overloads,
 )
