@@ -77,7 +77,6 @@ CPPFLAGS += \
 	-Wno-error=unused-function -Wno-error=unused-but-set-variable \
 	-Wno-error=unused-variable -Wno-error=deprecated-declarations \
 	-Wno-error=sign-compare -Wno-error=cpp \
-	-faligned-new \
 	-I $(UPY_PORT_DIR) \
 	-I $(UPY_PORT_DIR)/boards/GENERIC \
 	-I $(ESPCOMP)/esp_rom/include \
