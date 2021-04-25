@@ -82,11 +82,11 @@ endif  # $(LIBTORCH) local_lite/local_esp
 $(BUILD_ROOT)/prebuilt/libtorch:
 	mkdir -p $(BUILD_ROOT)
 ifeq ($(UNAME), Linux)
-	cd $(BUILD_ROOT) && curl -LsO 'https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-1.7.1%2Bcpu.zip'
-	cd $(BUILD_ROOT) && unzip -qq -o libtorch-cxx11-abi-shared-with-deps-1.7.1%2Bcpu.zip -d prebuilt
+	cd $(BUILD_ROOT) && curl -LsO 'https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-1.8.1%2Bcpu.zip'
+	cd $(BUILD_ROOT) && unzip -qq -o libtorch-cxx11-abi-shared-with-deps-1.8.1%2Bcpu.zip -d prebuilt
 else ifeq ($(UNAME), Darwin)
-	cd $(BUILD_ROOT) && curl -LsO 'https://download.pytorch.org/libtorch/cpu/libtorch-macos-1.7.1.zip'
-	cd $(BUILD_ROOT) && unzip -qq -o libtorch-macos-1.7.1.zip -d prebuilt
+	cd $(BUILD_ROOT) && curl -LsO 'https://download.pytorch.org/libtorch/cpu/libtorch-macos-1.8.1.zip'
+	cd $(BUILD_ROOT) && unzip -qq -o libtorch-macos-1.8.1.zip -d prebuilt
 endif
 
 $(BUILD_ROOT)/local/libtorch:
