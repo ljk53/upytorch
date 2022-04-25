@@ -45,7 +45,8 @@ static bool should_allow_numbers_as_tensors(const std::string& name) {
     "mul", "mul_", "mul_out",
     "sub", "sub_", "sub_out",
     "true_divide", "true_divide_", "true_divide_out",
-    "floor_divide", "floor_divide_", "floor_divide_out"
+    "floor_divide", "floor_divide_", "floor_divide_out",
+    "cat",
   };
   return allowed.find(name) != allowed.end();
 }
@@ -101,24 +102,23 @@ bool is_tensor(mp_obj_t obj) {
   return UPTVariable_Check(obj);
 }
 
-// bool is_tensor_list(mp_obj_t obj, int argnum, bool throw_error) {
-//   auto tuple = six::isTuple(obj);
-//   if (!(tuple || PyList_Check(obj))) {
-//     return false;
-//   }
-//   auto size = tuple ? PyTuple_GET_SIZE(obj) : PyList_GET_SIZE(obj);
-//   for (size_t idx = 0; idx < size; idx++) {
-//     mp_obj_t iobj = tuple ? PyTuple_GET_ITEM(obj, idx) : PyList_GET_ITEM(obj, idx);
-//     if (!is_tensor(iobj)) {
-//       if (throw_error) {
-//         throw TypeError("expected Tensor as element %d in argument %d, but got %s",
-//             static_cast<int>(idx), argnum, Py_TYPE(iobj)->tp_name);
-//       }
-//       return false;
-//     }
-//   }
-//   return true;
-// }
+bool is_tensor_list(mp_obj_t obj, int argnum, bool throw_error) {
+   auto tuple = isTuple(obj);
+   auto list_obj = isList(obj);
+   if(!(tuple || list_obj)) {
+     return false;
+   }
+
+  mp_obj_iter_buf_t iter_buf;
+  mp_obj_t iobj, iterable = mp_getiter(obj, &iter_buf);
+  while ((iobj = mp_iternext(iterable)) != MP_OBJ_STOP_ITERATION) {
+    if (!is_tensor(iobj)) {
+      throw std::runtime_error("Expected tensor type element for tensorlist");
+      return false;
+     }
+  }
+  return true;
+}
 
 // bool is_float_or_complex_list(mp_obj_t obj) {
 //   auto tuple = six::isTuple(obj);
@@ -177,9 +177,9 @@ auto FunctionParameter::check(mp_obj_t obj, int argnum) -> bool
     //   // if a size is specified (e.g. DimnameList[1]) we also allow passing a single Dimname
     //   return size == 1 && THPUtils_checkDimname(obj);
     // }
-    // case ParameterType::TENSOR_LIST: {
-    //   return is_tensor_list(obj, argnum, true /* throw_error */);
-    // }
+     case ParameterType::TENSOR_LIST: {
+       return is_tensor_list(obj, argnum, true /* throw_error */);
+     }
     case ParameterType::INT_LIST: {
       if (isTuple(obj) || isList(obj)) {
         return true;
