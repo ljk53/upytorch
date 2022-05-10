@@ -32,6 +32,8 @@ class AlexNet(nn.Module):
             nn.ReLU(inplace=True),
             nn.Linear(4096, num_classes),
         )
+        #self.pp = nn.Parameter(torch.ones(1, 3, 64, 64))
+        self.bn1 = nn.BatchNorm2d(256)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = self.features(x)
@@ -55,6 +57,6 @@ def alexnet():
 
 if __name__ == "__main__":
     report_header()
-    benchmark("AlexNet_100_inc_gc", alexnet(), 100, include_gc=True)
-    benchmark("AlexNet_100_exc_gc", alexnet(), 100)
+    benchmark("AlexNet_100_inc_gc", alexnet(), 1, include_gc=True)
+    #benchmark("AlexNet_100_exc_gc", alexnet(), 100)
     print()

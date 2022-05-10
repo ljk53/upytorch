@@ -251,15 +251,16 @@ class Module:
             >>> self.register_buffer('running_mean', torch.zeros(num_features))
 
         """
+
         if persistent is False and isinstance(self, torch.jit.ScriptModule):
             raise RuntimeError("ScriptModule does not support non-persistent buffers")
 
         if '_buffers' not in self.__dict__:
             raise AttributeError(
                 "cannot assign buffer before Module.__init__() call")
-        elif not isinstance(name, torch._six.string_classes):
-            raise TypeError("buffer name should be a string. "
-                            "Got {}".format(torch.typename(name)))
+        #elif not isinstance(name, torch._six.string_classes):
+        #    raise TypeError("buffer name should be a string. "
+        #                    "Got {}".format(torch.typename(name)))
         elif '.' in name:
             raise KeyError("buffer name can't contain \".\"")
         elif name == '':

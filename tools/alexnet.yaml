@@ -9,3 +9,9 @@
 - aten::ones
 - aten::relu_
 - aten::t
+- aten::batch_norm
+- aten::zeros
+- aten::typename
+- aten::zero_
+- aten::fill_
+- aten::no_grad
