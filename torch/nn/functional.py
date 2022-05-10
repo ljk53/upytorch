@@ -102,3 +102,22 @@ def adaptive_avg_pool2d(input, output_size):
     """
     _output_size = _list_with_default(output_size, input.size())
     return torch.adaptive_avg_pool2d(input, _output_size)
+
+def batch_norm(
+    input,
+    running_mean,
+    running_var,
+    weight = None,
+    bias = None,
+    training = False,
+    momentum = 0.1,
+    eps = 1e-5,
+) -> Tensor:
+    # noqa
+    r"""Applies Batch Normalization for each channel across a batch of data.
+
+    See :class:`~torch.nn.BatchNorm1d`, :class:`~torch.nn.BatchNorm2d`,
+    :class:`~torch.nn.BatchNorm3d` for details.
+    """
+    return torch.batch_norm(
+        input, weight, bias, running_mean, running_var, training, momentum, eps, False)

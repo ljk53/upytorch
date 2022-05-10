@@ -115,6 +115,10 @@ void UPTVariable_print(const mp_print_t* print, mp_obj_t self_, mp_print_kind_t 
   mp_printf(print, out.str().c_str());
 }
 
+mp_obj_t UPTVariable_make_new(const mp_obj_type_t *self_in, size_t n_args, size_t n_kw, const mp_obj_t *args) {
+    return MP_OBJ_FROM_PTR(mp_obj_get_type(args[0]));
+}
+
 // THPVariable_initModule
 void UPTVariable_initModule(mp_obj_module_t* module) {
   // In PyTorch the native functions are bound to torch._C._TensorBase.
