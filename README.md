@@ -23,7 +23,7 @@
 
 ## Checkout the repo and submodules (MicroPython 1.13 + PyTorch dev branch + ESP-IDF SDK)
 ```bash
-git clone --recursive https://github.com/ljk53/upytorch
+git clone --recursive https://github.com/nikithamalgifb/upytorch
 ```
 
 ## Option A) Build MicroPython + PyTorch binding locally, dynamically link with the prebuilt LibTorch 1.7 from the official website.
