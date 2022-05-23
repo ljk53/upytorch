@@ -97,7 +97,7 @@ struct PythonArgs {
   inline c10::optional<at::Tensor> optionalTensor(int i);
   inline at::Scalar scalar(int i);
   inline at::Scalar scalarWithDefault(int i, at::Scalar default_scalar);
-//   inline std::vector<at::Tensor> tensorlist(int i);
+  inline std::vector<at::Tensor> tensorlist(int i);
 //   template<int N>
 //   inline std::array<at::Tensor, N> tensorlist_n(int i);
   inline std::vector<int64_t> intlist(int i);
@@ -227,20 +227,26 @@ inline c10::optional<at::Scalar> PythonArgs::scalarOptional(int i) {
   return scalar_slow(i);
 }
 
-// inline std::vector<at::Tensor> PythonArgs::tensorlist(int i) {
-//   if (isNull(args[i])) return std::vector<at::Tensor>();
-//   auto tuple = six::isTuple(args[i]);
-//   THPObjectPtr arg = six::maybeAsTuple(args[i]);
-//   auto size = tuple ? PyTuple_GET_SIZE(arg.get()) : PyList_GET_SIZE(arg.get());
-//   std::vector<at::Tensor> res(size);
-//   for (int idx = 0; idx < size; idx++) {
-//     mp_obj_t obj = tuple ? PyTuple_GET_ITEM(arg.get(), idx) : PyList_GET_ITEM(arg.get(), idx);
-//     // This is checked by the argument parser so it's safe to cast without checking
-//     // if this is a tensor first
-//     res[idx] = reinterpret_cast<THPVariable*>(obj)->cdata;
-//   }
-//   return res;
-// }
+inline std::vector<at::Tensor> PythonArgs::tensorlist(int i) {
+  if (isNull(args[i])) return std::vector<at::Tensor>();
+
+  std::vector<at::Tensor> res;
+  auto tuple = isTuple(args[i]);
+  auto list = isList(args[i]);
+
+  if(!(tuple || list)) {
+    return res;
+  }
+  mp_obj_t arg = args[i];
+  mp_obj_iter_buf_t iter_buf;
+  mp_obj_t item, iterable = mp_getiter(arg, &iter_buf);
+
+  while ((item = mp_iternext(iterable)) != MP_OBJ_STOP_ITERATION) {
+    mp_obj_t obj = item;
+    res.push_back(UPTVariable_Unpack(obj));
+  }
+  return res;
+}
 
 // template<int N>
 // inline std::array<at::Tensor, N> PythonArgs::tensorlist_n(int i) {
