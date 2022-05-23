@@ -42,3 +42,5 @@
 - aten::zeros
 - aten::zeros.out
 - aten::zeros_like
+- aten::cat
+- aten::cat.out
